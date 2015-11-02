@@ -1,3 +1,4 @@
+
 /**
  * An autonomous robot capable of finding and manipulating Styrofoam blocks, 
  * while navigating within an enclosed area populated with known obstacles randomly placed with a 12Õ x 12Õ enclosure.
@@ -71,7 +72,7 @@ public class Robot {
 	 * it will perform the localization and block finding routines in sequence.
 	 */
 	public static void execute(){
-		double[] landmarks = null; //enemy base, home base, starting position, etc.
+		Point2D[] landmarks = null; //enemy base, home base, starting position, etc.
 		//TODO: package for Wifi communications not available yet on mycourses. 
 		//wait for information from computer about its coordinates and enemy base, etc. 
 		
@@ -86,7 +87,7 @@ public class Robot {
 	/**
 	 * Localizes to the coordinates given
 	 */
-	public static void localize(double[] landmarks){
+	public static void localize(Point2D[] landmarks){
 		//instantiate localizer
 		Localizer loca = new Localizer(navi, obDetector);
 		//convert coordinates so that they are relative to the robot's 0,0.
@@ -114,6 +115,7 @@ public class Robot {
 	 */
 	public static void findFlag(){
 		// search enemy zone for the flag
+		FlagFinder flagFinder = new FlagFinder(obDetector);
 	}
 	
 	/**

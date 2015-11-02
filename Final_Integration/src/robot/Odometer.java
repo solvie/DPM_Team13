@@ -41,7 +41,13 @@ public class Odometer implements TimerListener {
 	private double[] oldDH, dDH;
 	private int flag;
 	
-	// constructor
+	/**
+	 * Default constructor
+	 * @param leftMotor the left motor
+	 * @param rightMotor the right motor
+	 * @param INTERVAL the interval of time we want the timer to time out at.
+	 * @param autostart whether the timer should autostart or not.
+	 */
 	public Odometer (EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, int INTERVAL, boolean autostart) {
 		
 		this.leftMotor = leftMotor;
@@ -64,18 +70,24 @@ public class Odometer implements TimerListener {
 			this.timer = null;
 	}
 	
-	// functions to start/stop the timerlistener
+	/**
+	 * Function to start the timerlistener
+	 */
 	public void stop() {
 		if (this.timer != null)
 			this.timer.stop();
 	}
+	/**
+	 * Function to stop the timerlistener
+	 */
 	public void start() {
 		if (this.timer != null)
 			this.timer.start();
 	}
 	
-	/*
-	 * Calculates displacement and heading as title suggests
+	/**
+	 * Calculates the displacement and heading of the robot
+	 * @param data displacement and heading
 	 */
 	private void getDisplacementAndHeading(double[] data) {
 		int leftTacho, rightTacho;
@@ -86,8 +98,8 @@ public class Odometer implements TimerListener {
 		data[1] = (rightTacho * rightRadius - leftTacho * leftRadius) / width;
 	}
 	
-	/*
-	 * Recompute the odometer values using the displacement and heading changes
+	/**
+	 * Recomputes the odometer values using the displacement and heading changes
 	 */
 	public void timedOut() {
 		
@@ -108,28 +120,40 @@ public class Odometer implements TimerListener {
 		oldDH[1] += dDH[1];
 	}
 
-	// return X value
+	/**
+	 * Allows outside classes to access the robot's X coordinate
+	 * @return x coordinate
+	 */
 	public double getX() {
 		synchronized (this) {
 			return x;
 		}
 	}
 
-	// return Y value
+	/**
+	 * Allows outside classes to access the robot's Y coordinate
+	 * @return y coordinate
+	 */
 	public double getY() {
 		synchronized (this) {
 			return y;
 		}
 	}
 
-	// return theta value
+	/** Allows outside classes to access the robot's heading
+	 * @return heading theta
+	 */
 	public double getAng() {
 		synchronized (this) {
 			return theta;
 		}
 	}
 
-	// set x,y,theta
+	/**
+	 * Sets the position of the robot as requested by the update array of booleans.
+	 * @param position x, y, theta position values
+	 * @param update whether we should update the x, y, and or theta position values.
+	 */
 	public void setPosition(double[] position, boolean[] update) {
 		synchronized (this) {
 			if (update[0])
@@ -141,7 +165,10 @@ public class Odometer implements TimerListener {
 		}
 	}
 
-	// return x,y,theta
+	/**
+	 * Getter method for the position of the robot
+	 * @param position array of doubles to be filled with the relevant info
+	 */
 	public void getPosition(double[] position) {
 		synchronized (this) {
 			position[0] = x;
@@ -150,28 +177,38 @@ public class Odometer implements TimerListener {
 		}
 	}
 
+	/**
+	 * Another getter method for the robot
+	 * @return an array of doubles filled with the relevant info
+	 */
 	public double[] getPosition() {
 		synchronized (this) {
 			return new double[] { x, y, theta };
 		}
 	}
 	
-	// accessors to motors
+	/**
+	 * Accessor to motors
+	 * @return Left motor in index 0, right motor in index 1.
+	 */
 	public EV3LargeRegulatedMotor [] getMotors() {
 		return new EV3LargeRegulatedMotor[] {this.leftMotor, this.rightMotor};
 	}
-	public EV3LargeRegulatedMotor getLeftMotor() {
-		return this.leftMotor;
-	}
-	public EV3LargeRegulatedMotor getRightMotor() {
-		return this.rightMotor;
-	}
+	
+	/**
+	 * Accessor for the odometer's timer
+	 * @return timer
+	 */
 	
 	public Timer getOdoTimer(){
 		return timer;
 	}
 
-	// static 'helper' methods
+	/**
+	 * This method corrects the angle such that it will not be a negative value
+	 * @param angle angle to fix
+	 * @return corrected angle
+	 */
 	public static double fixDegAngle(double angle) {
 		if (angle < 0.0)
 			angle = 360.0 + (angle % 360.0);
@@ -179,6 +216,12 @@ public class Odometer implements TimerListener {
 		return angle % 360.0;
 	}
 
+	/**
+	 * This helper method calculates the minimum angle from a to b
+	 * @param a angle a
+	 * @param b angle b
+	 * @return the minimum angle from a to b
+	 */
 	public static double minimumAngleFromTo(double a, double b) {
 		double d = fixDegAngle(b - a);
 
@@ -188,10 +231,10 @@ public class Odometer implements TimerListener {
 			return d - 360.0;
 	}
 	
-	public int getFlag(){
-		return flag;
-	}
-
+	/**
+	 * This method allows the user to set the value representing the width of the wheelbase
+	 * @param width the width of the wheelbase
+	 */
 	public void setWidth(double width){
 		this.width = width;
 	}

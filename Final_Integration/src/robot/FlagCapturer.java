@@ -1,5 +1,7 @@
 package robot;
 
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
+
 /**
  * This class is responsible for manipulating the arm to pick up the flag once it has been found.
  * 
@@ -8,8 +10,14 @@ package robot;
 
 public class FlagCapturer {
 
-	public FlagCapturer(){
-		
+	private EV3LargeRegulatedMotor armMotor;
+	
+	/**
+	 * Default constructor
+	 * @param armMotor the motor that controls the arm of the robot. 
+	 */
+	public FlagCapturer(EV3LargeRegulatedMotor armMotor){
+		this.armMotor = armMotor;
 	}
 	
 }

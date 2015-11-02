@@ -4,6 +4,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.geometry.Point2D;
 /**
  * This class is used to find the enemy base without colliding into any of the obstacles, and to return to the home base.
+ * 
  * @version 1.0
  * @author Solvie Lee
  *
@@ -14,18 +15,26 @@ public class PathFinder {
 	private Odometer odo;
 	private ObjectDetector obDetector;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
-	
+	/**
+	 * Default constructor
+	 * @param navi the Navigator
+	 */
 	public PathFinder(Navigator navi){
 		this.navi = navi;
 		this.odo = navi.getOdo();
-		this.leftMotor = odo.getLeftMotor();
-		this.rightMotor = odo.getRightMotor();
+		this.leftMotor = odo.getMotors()[0];
+		this.rightMotor = odo.getMotors()[1];
 		this.obDetector = obDetector;
 	}
-	
-	/** This method will make the robot go from its current point to the destination point travelling entirely along lines 
+
+	/**
+	 * This method will make the robot go from its current point to the destination point travelling entirely along lines 
 	 * parallel to the x and y axis. At its base, it should travel from start to end the two tangent lines of the shortest distance vector
-	 * unless a block gets in its way. It should also keep track of where all the blocks were detected. 
+	 * unless a block gets in its way. It should also keep track of where all the blocks were detected.
+	 * @param x X coordinate of destination
+	 * @param y Y coordinate of destination
+	 * @param obstacles coordinates of the centers of all the detected obstacles
+	 * @return Point2D[]
 	 */
 	public Point2D[] findPathTo(double x, double y, Point2D[] obstacles){
 		/*double currX, currY, currTheta, horizl, vertl;

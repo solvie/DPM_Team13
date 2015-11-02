@@ -27,19 +27,28 @@ public class Navigator {
 	private Point2D[] knownObstacles;
 	private boolean thereIsObject, thereIsObjectWithinD, objectColorSeen;
 	
+	/**
+	 * Default constructor
+	 * @param odo the odometer that will provide position data to the navigator.
+	 */
 	public Navigator(Odometer odo){
 		this.odo = odo;
-		this.leftMotor = odo.getLeftMotor();
-		this.rightMotor = odo.getRightMotor();
+		this.leftMotor = odo.getMotors()[0];
+		this.rightMotor = odo.getMotors()[1];
 		this.thereIsObject = false;
 		this.thereIsObjectWithinD = false;
 		this.objectColorSeen = false;
 	}
 	
 	
-	/** This method will make the robot go from its current point to the destination point travelling entirely along lines 
+	/**
+	 * This method will make the robot go from its current point to the destination point travelling entirely along lines 
 	 * parallel to the x and y axis. At its base, it should travel from start to end the two tangent lines of the shortest distance vector
 	 * unless a block gets in its way. It should also keep track of where all the blocks were detected, so that its return journey is easier.
+	 * @param x X coordinate of destination point
+	 * @param y Y coordinate of destination point
+	 * @param obstacles empty array of 2D points that will be filled with coordinates of obstacles by the end of the method.
+	 * @return Point2D[] an array of 2D points that describe the positions of the obstacles
 	 */
 	public Point2D[] squareTravel(double x, double y, Point2D[] obstacles){
 		//TODO: commented out for now.
@@ -84,7 +93,12 @@ public class Navigator {
 		return obstacles;
 	}
 	
-	//The regular travelTo method - will likely be deprecated
+	/**
+	 * The conventional method of travelling to a point; calculates and turns to the heading it must face and drives the distance
+	 * that it must go to arrive at the destination described by input points. May be deprecated.
+	 * @param x X coordinate of destination
+	 * @param y Y coordinate of destination
+	 */
 	public void travelTo(double x, double y){
 		double currX, currY, trajTheta, distance;
 		// calculate the amount of theta to turn, and turn by that amount
@@ -106,7 +120,14 @@ public class Navigator {
 		rightMotor.stop(true);
 	}
 	
-	//The travelTo method that stops when an obstacle is detected. 
+	/**
+	 * Travels to the destination point in a similar manner as the travelTo method. However, it will slow down when it sees an obstacle, 
+	 * and stop when it is a certain distance away from it. (TODO: define that distance, maybe pass it in as a parameter)
+	 * @param x X coordinate of destination
+	 * @param y Y coordinate of destination
+	 * @return A boolean value that is false if the robot detected an obstacle and true if it was able to reach the destination point without 
+	 * detecting any obstacles.
+	 */
 	public boolean travelToWithAvoidance(double x, double y){
 		/*double currX, currY, trajTheta, distance;
 		if (thereIsObjectWithinD) //if there is an object right at the start.
@@ -139,6 +160,11 @@ public class Navigator {
 		return true;
 	}
 	
+	/**
+	 * This method turns the robot in place to face the specified destination heading.
+	 * @param theta the destination heading value in degrees, with the positive x axis representing 0 and the positive y axis representing 90.
+	 * If theta is a negative value, the robot will turn towards it counterclockwise, and if theta is positive, the robot will turn towards it clockwise.
+	 */
 	public void turnTo(double theta) {
 		/*leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
@@ -169,6 +195,14 @@ public class Navigator {
 		}*/
 	}
 	
+	/**
+	 * Calculates the destination heading based on the current point coordinates and the destination point coordinates.
+	 * @param x X coordinates of destination
+	 * @param y Y coordinates of destination
+	 * @param currX current X coordinates (starting point)
+	 * @param currY current Y coordinates
+	 * @return a heading angle in degrees.
+	 */
 	public double getArcTan(double x, double y, double currX, double currY) {
 		double value, xdiff, ydiff;
 		xdiff = x - currX;
@@ -188,6 +222,9 @@ public class Navigator {
 		return value;
 	}
 		
+	/**
+	 * Allows the robot to turn Clockwise.
+	 */
 	public void turnClockwise(){
 		leftMotor.setSpeed(SLOWER_ROTATE);
 		rightMotor.setSpeed(SLOWER_ROTATE);
@@ -195,6 +232,9 @@ public class Navigator {
 		rightMotor.backward();
 	}
 	
+	/**
+	 * Allows the robot to turn counter clockwise.
+	 */
 	public void turnCounterClockwise(){
 		leftMotor.setSpeed(SLOWER_ROTATE);
 		rightMotor.setSpeed(SLOWER_ROTATE);
@@ -202,12 +242,20 @@ public class Navigator {
 		rightMotor.forward();
 	}
 	
+	/**
+	 * Stops the motors
+	 */
 	public void stopMotors(){
 		leftMotor.stop(true);
 		rightMotor.stop(true);
 	}
 	
-	
+	/**
+	 * Allows outside classes to set the boolean values of whether there is an object in front of the robot, whether the object is within D cm
+	 * and whether the object's color was seen.
+	 * @param info the boolean values
+	 * @param update boolean values of whether we want to update this value. 
+	 */
 	public void setDetectionInfo(boolean[] info, boolean[] update){
 		if (update[0])
 			this.thereIsObject =info[0];
@@ -217,6 +265,10 @@ public class Navigator {
 			this.objectColorSeen = info[2];
 	}
 	
+	/**
+	 * Allows outside classes to access the navigator's odometer
+	 * @return the navigator's odometer.
+	 */
 	public Odometer getOdo(){
 		return odo;
 	}
