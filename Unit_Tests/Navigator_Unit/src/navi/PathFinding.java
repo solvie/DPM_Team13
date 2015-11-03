@@ -47,7 +47,7 @@ public class PathFinding {
 		
 		Point2D[] obstacles = new Point2D[10];
 		
-		navi.squareTravel(60, 120, obstacles);
+		navi.squareTravel(60, 50, obstacles);
 		
 	}
 	

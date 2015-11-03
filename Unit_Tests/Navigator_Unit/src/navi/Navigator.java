@@ -12,36 +12,28 @@ import lejos.utility.TimerListener;
  * can find a path from point A to point B given new obstacle information along the way, travelling only along lines parallel
  * to the X and Y axes, (for the purposes of having more accurate odometry correction).
  * 
- * Therefore, it does not actually use ultrasonic data (that will be a different test) to detect blocks, but will be given new block
+ * Therefore, it does not  actually use ultrasonic data (that will be a different test) to detect blocks, but will be given new block
  * information at various intervals, from an outside class. 
  *  
  */
 
-public class Navigator implements TimerListener {
+public class Navigator extends Thread {
 	private static final int SLOWER_ROTATE = 30;
 	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, DEG_ERR = 2, D = 15;
 	private Odometer odo;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
-	private Timer timer;
 	private Point2D[] knownObstacles;
 	private boolean thereIsObject, thereIsObjectWithinD, objectColorSeen;
 	
 	public Navigator(Odometer odo){
 		this.odo = odo;
-		this.timer = new Timer(DEFAULT_TIMEOUT_PERIOD, this);
 		this.leftMotor = odo.getLeftMotor();
 		this.rightMotor = odo.getRightMotor();
 		this.thereIsObject = false;
 		this.thereIsObjectWithinD = false;
 		this.objectColorSeen = false;
-		timer.start();
 	}
 	
-	public void timedOut(){
-		/* check ultrasonic data every time the timer times out.
-		 * for the purposes of this unit test, block data will be hardcoded so this can stay empty for now.
-		 */ 
-	}
 	
 	/* This method will make the robot go from its current point to the destination point travelling entirely along lines 
 	 * parallel to the x and y axis. At its base, it should travel from start to end the two tangent lines of the shortest distance vector
@@ -57,7 +49,7 @@ public class Navigator implements TimerListener {
 		
 		horizl = Math.abs(x - currX);
 		vertl = Math.abs(y - currY);
-		//set up wayPoints to travel the longer way first
+		//set up wayPoints to travel the longer way first, IF there is no obstacle immediately in front, in which case, travel to where there is no obstacle.
 		
 		if (horizl-vertl>=0){
 			wayPoints[0] = new Point2D.Double(x, currY);
@@ -72,19 +64,25 @@ public class Navigator implements TimerListener {
 		//you stay put.
 		boolean pathBlocked1, pathBlocked2;
 		
-		if (!(odo.getX()==x && odo.getY()==y)){ //While we've not reached the destination, this happens. //TODO: modify so that there's more room for error.
+		if (!(((odo.getX()<x+DEG_ERR)&&(odo.getX()>x-DEG_ERR)) && ((odo.getY()<y+DEG_ERR)&&(odo.getY()>y-DEG_ERR)))){ //While we've not reached the destination, this happens. //TODO: modify so that there's more room for error.
 			//travel to the first point. If we try to travel there and don't reach the correct place, the same method is called again. 
 			pathBlocked1 = travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
-			pathBlocked2 = travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
-			if (pathBlocked1&&!pathBlocked2) // if it reaches the end of the path and the first one had been blocked, try to travel the first path again. 
-				pathBlocked1 = travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
-			if (pathBlocked1 &&pathBlocked2){
-				//TODO: try to move around the block. 
+			if (pathBlocked1){
+				//pathBlocked2 = travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
+				obstacles = squareTravel(x, y, obstacles);
+				//TODO: deal with hard case where there are two immediate blocks. 
 			}
-		}
-		else{ //base case
-			leftMotor.stop(true);
-			rightMotor.stop(true);
+			else{
+				pathBlocked2 =travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
+				if (pathBlocked2){
+					obstacles = squareTravel(x, y, obstacles);
+				}
+				else{
+					leftMotor.stop(true);
+					rightMotor.stop(true);
+					return obstacles;
+				}
+			}	
 		}
 		return obstacles;
 	}
@@ -115,7 +113,7 @@ public class Navigator implements TimerListener {
 	public boolean travelToWithAvoidance(double x, double y){
 		double currX, currY, trajTheta, distance;
 		if (thereIsObjectWithinD) //if there is an object right at the start.
-			return false;
+			return true;
 		// calculate the amount of theta to turn, and turn by that amount
 		currX = odo.getX();
 		currY = odo.getY();
@@ -134,14 +132,15 @@ public class Navigator implements TimerListener {
 					rightMotor.setSpeed(HALF_SPEED);
 					leftMotor.forward();
 					rightMotor.forward();
-					if (thereIsObjectWithinD)
-						break;
+					if (thereIsObjectWithinD){
+						return true;
+					}
 				}
 		}
 		leftMotor.stop(true);
 		rightMotor.stop(true);
 		
-		return true;
+		return false;
 	}
 	
 	public void turnTo(double theta) {
@@ -212,10 +211,6 @@ public class Navigator implements TimerListener {
 	public void stopMotors(){
 		leftMotor.stop();
 		rightMotor.stop();
-	}
-	
-	public void stop(){
-		this.timer.stop();
 	}
 	
 	public void setDetectionInfo(boolean[] info, boolean[] update){
