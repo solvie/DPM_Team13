@@ -19,9 +19,9 @@ public class FlagFinder {
 	/** Default constructor
 	 * @param obDetector the ObjectDetector
 	 */
-	public FlagFinder(Navigator navi, ObjectDetector obDetector){
+	public FlagFinder(ObjectDetector obDetector){
 		this.obDetector = obDetector;
-		this.navi = navi;
+		this.navi = obDetector.getNavi();
 		this.odo = navi.getOdo();
 		
 	}

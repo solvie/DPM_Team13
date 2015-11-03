@@ -32,7 +32,11 @@ public class Robot {
 	private static Navigator navi;
 	private static Odometer odo;
 	private static ObjectDetector obDetector;
-	private static Point2D[] obstacles;
+	private static Localizer loca;
+	private static PathFinder pathFinder;
+	private static FlagFinder flagFinder;
+	private static FlagCapturer flagCapturer;
+	private static Point2D[] obstacles, landmarks;
 	private static final int NUM_OBSTACLES = 20;
 	
 
@@ -82,7 +86,7 @@ public class Robot {
 	 * it will perform the localization and block finding routines in sequence.
 	 */
 	public static void execute(){
-		Point2D[] landmarks = null; //enemy base, home base, starting position, etc.
+		landmarks = null; //SET enemy base, home base, starting position, etc.
 		//(package for Wifi communications not available yet on mycourses.) 
 		
 		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
@@ -100,7 +104,7 @@ public class Robot {
 	public static void localize(Point2D[] landmarks){
 		display.setPart(1);
 		//instantiate localizer
-		Localizer loca = new Localizer(navi, obDetector);
+		loca = new Localizer(obDetector);
 		//convert coordinates so that they are relative to the robot's 0,0.
 		loca.convertCoordinates(landmarks);
 		//perform localization routine.
@@ -116,7 +120,7 @@ public class Robot {
 		//TODO set x and y to the coordinates of the enemy base 
 		
 		// instantiate pathfinder and empty obstacles array
-		PathFinder pathFinder = new PathFinder(navi, obDetector);
+		pathFinder = new PathFinder(obDetector);
 		//go to the path. 
 		pathFinder.findPathTo(x, y, obstacles);
 		
@@ -127,7 +131,9 @@ public class Robot {
 	public static void findFlag(){
 		display.setPart(3);
 		// search enemy zone for the flag
-		FlagFinder flagFinder = new FlagFinder(navi, obDetector);
+		Point2D[] enemyZone= null; //TODO set this to enemy zone coordinates
+		flagFinder = new FlagFinder(obDetector);
+		flagFinder.search(enemyZone);
 	}
 	
 	/**
@@ -136,7 +142,7 @@ public class Robot {
 	public static void captureFlag(){
 		display.setPart(4);
 		//capture the flag with the arm
-		FlagCapturer flagCapturer = new FlagCapturer(armMotor);
+		flagCapturer = new FlagCapturer(armMotor);
 		flagCapturer.capture();
 	}
 	
@@ -148,9 +154,7 @@ public class Robot {
 		//return the flag to the destination
 		double x=0, y=0;
 		//TODO set x and y to the coordinates of the home base
-		
-		PathFinder returnPathFinder = new PathFinder(navi, obDetector);
-		returnPathFinder.findPathTo(x,y, obstacles);
+		pathFinder.findPathTo(x,y, obstacles);
 		
 	}
 	

@@ -17,10 +17,9 @@ public class Localizer {
 	
 	/**
 	 * Default constructor
-	 * @param navi the Navigator
 	 * @param obDetector the ObjectDetector
 	 */
-	public Localizer(Navigator navi, ObjectDetector obDetector){
+	public Localizer(ObjectDetector obDetector){
 		
 	}
 	
