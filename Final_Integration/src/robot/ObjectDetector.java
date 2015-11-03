@@ -30,11 +30,12 @@ public class ObjectDetector implements TimerListener {
 	 * @param colorSensor the SampleProvider for color values
 	 * @param colorValue the color values from the SampleProvider.
 	 */
-	public ObjectDetector(Navigator navi, SampleProvider usSensor, float[] usValue, SampleProvider colorSensor, float[] colorValue){
+	public ObjectDetector(Navigator navi, SampleProvider usSensor, float[] usValue, SampleProvider colorSensor, float[] colorValue, boolean AUTOSTART){
 		this.navi = navi;
 		this.odo = navi.getOdo();
 		this.timer = new Timer(DEFAULT_INTERVAL, this);
-		
+		if (AUTOSTART)
+			this.timer.start();
 	}
 	
 	/**

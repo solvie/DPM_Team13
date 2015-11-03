@@ -1,16 +1,4 @@
 
-/**
- * An autonomous robot capable of finding and manipulating Styrofoam blocks, 
- * while navigating within an enclosed area populated with known obstacles randomly placed with a 12Õ x 12Õ enclosure.
- * 
- * This is the main robot class from which the program will be executed and all the operations will be called.
- * 
- * @author Solvie Lee
- * @version 1.0
- * 
- */
-
-
 package robot;
 
 import lejos.hardware.Button;
@@ -23,16 +11,30 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 import lejos.robotics.geometry.Point2D;
 
+/**
+ * An autonomous robot capable of finding and manipulating Styrofoam blocks, 
+ * while navigating within an enclosed area populated with known obstacles randomly placed with a 12 x 12 enclosure.
+ * 
+ * This is the main robot class from which the program will be executed and all the operations will be called.
+ * 
+ * @version 1.0
+ * @author Solvie Lee
+ *
+ */
 public class Robot {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");		
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
+	private static final Port colorPort2 = LocalEV3.get().getPort("S3");
+	private static Display display;
 	private static Navigator navi;
 	private static Odometer odo;
 	private static ObjectDetector obDetector;
+	private static Point2D[] obstacles;
 	private static final int NUM_OBSTACLES = 20;
+	
 
 	public static void main(String[] args){
 		//Set up the ultrasonic sensor
@@ -40,17 +42,25 @@ public class Robot {
 		SampleProvider usValue = usSensor.getMode("Distance");
 		float[] usData = new float[usValue.sampleSize()];
 		
-		//Set up the color sensor
+		//Set up the color sensor for object detection
 		SensorModes colorSensor = new EV3ColorSensor(colorPort);
 		SampleProvider colorValue = colorSensor.getMode("ColorID");//TODO: change mode?
 		float[] colorData = new float[colorValue.sampleSize()];
+		
+		//Set up light sensor for odo
+		SensorModes colorSensor2 = new EV3ColorSensor(colorPort);
+		SampleProvider colorValue2 = colorSensor.getMode("Red");//TODO: change mode?
+		float[] colorData2 = new float[colorValue.sampleSize()];
 	
 		//Set up display
-		Display display = new Display();
+		display = new Display();
+		display.setPart(0);
 		
-		odo = new Odometer(leftMotor, rightMotor, 20, true);
+		odo = new Odometer(leftMotor, rightMotor, colorValue2, colorData2, 20, true);
 		navi = new Navigator(odo);
-		obDetector = new ObjectDetector(navi, usValue, usData, colorValue, colorData);
+		obDetector = new ObjectDetector(navi, usValue, usData, colorValue, colorData, true);
+		
+		obstacles = new Point2D[NUM_OBSTACLES];
 		
 		int option = 0;
 		while (option == 0)
@@ -73,9 +83,9 @@ public class Robot {
 	 */
 	public static void execute(){
 		Point2D[] landmarks = null; //enemy base, home base, starting position, etc.
-		//TODO: package for Wifi communications not available yet on mycourses. 
-		//wait for information from computer about its coordinates and enemy base, etc. 
+		//(package for Wifi communications not available yet on mycourses.) 
 		
+		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
 		localize(landmarks);
 		findEnemyBase();
 		findFlag();
@@ -88,6 +98,7 @@ public class Robot {
 	 * Localizes to the coordinates given
 	 */
 	public static void localize(Point2D[] landmarks){
+		display.setPart(1);
 		//instantiate localizer
 		Localizer loca = new Localizer(navi, obDetector);
 		//convert coordinates so that they are relative to the robot's 0,0.
@@ -100,12 +111,12 @@ public class Robot {
 	 * This method uses the navigator to go to the enemy base while avoiding obstacles along the way
 	 */
 	public static void findEnemyBase(){
+		display.setPart(2);
 		double x=0, y=0;
 		//TODO set x and y to the coordinates of the enemy base 
 		
 		// instantiate pathfinder and empty obstacles array
-		Point2D[] obstacles = new Point2D[NUM_OBSTACLES];
-		PathFinder pathFinder = new PathFinder(navi);
+		PathFinder pathFinder = new PathFinder(navi, obDetector);
 		//go to the path. 
 		pathFinder.findPathTo(x, y, obstacles);
 		
@@ -114,22 +125,33 @@ public class Robot {
 	 * This method allows the robot to search the blocks in the enemy zone to find the flag
 	 */
 	public static void findFlag(){
+		display.setPart(3);
 		// search enemy zone for the flag
-		FlagFinder flagFinder = new FlagFinder(obDetector);
+		FlagFinder flagFinder = new FlagFinder(navi, obDetector);
 	}
 	
 	/**
 	 * This method uses the robot's arm to capture the flag
 	 */
 	public static void captureFlag(){
+		display.setPart(4);
 		//capture the flag with the arm
+		FlagCapturer flagCapturer = new FlagCapturer(armMotor);
+		flagCapturer.capture();
 	}
 	
 	/**
 	 * This method allows the robot to return to the home base and drop the block
 	 */
 	public static void returnHomeBase(){
+		display.setPart(2);
 		//return the flag to the destination
+		double x=0, y=0;
+		//TODO set x and y to the coordinates of the home base
+		
+		PathFinder returnPathFinder = new PathFinder(navi, obDetector);
+		returnPathFinder.findPathTo(x,y, obstacles);
+		
 	}
 	
 }

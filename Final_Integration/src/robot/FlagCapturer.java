@@ -19,5 +19,13 @@ public class FlagCapturer {
 	public FlagCapturer(EV3LargeRegulatedMotor armMotor){
 		this.armMotor = armMotor;
 	}
+
+	/**
+	 * Method to manipulate arm to grab the block that is the flag
+	 */
+	public void capture() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

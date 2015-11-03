@@ -15,11 +15,12 @@ public class PathFinder {
 	private Odometer odo;
 	private ObjectDetector obDetector;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
+	
 	/**
 	 * Default constructor
 	 * @param navi the Navigator
 	 */
-	public PathFinder(Navigator navi){
+	public PathFinder(Navigator navi, ObjectDetector obDetector){
 		this.navi = navi;
 		this.odo = navi.getOdo();
 		this.leftMotor = odo.getMotors()[0];

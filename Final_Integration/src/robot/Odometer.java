@@ -1,5 +1,13 @@
 package robot;
 
+
+
+import lejos.robotics.SampleProvider;
+import lejos.utility.Timer;
+import lejos.utility.TimerListener;
+import lejos.hardware.Button;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
+
 /**
  * Class which controls the odometer for the robot
  * 
@@ -20,21 +28,17 @@ package robot;
  * The odometer is initalized to 90 degrees, assuming the robot is facing up the positive y-axis
  * 
  *  File: Odometer.java
+ *  
  * @version 1.0
- * @author Sean Lawlor, ECSE 211 - Design Principles and Methods, Head TA Fall 2011
- * Ported to EV3 by: Francois Ouellet Delorme Fall 2015
- * 
+ * @author Sean Lawlor
+ *
  */
-
-import lejos.utility.Timer;
-import lejos.utility.TimerListener;
-import lejos.hardware.Button;
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
-
 public class Odometer implements TimerListener {
 
 	private Timer timer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
+	private SampleProvider colorSensor;
+	private float[] colorValue;
 	private final int DEFAULT_TIMEOUT_PERIOD = 20;
 	private double leftRadius, rightRadius, width;
 	private double x, y, theta;
@@ -48,7 +52,7 @@ public class Odometer implements TimerListener {
 	 * @param INTERVAL the interval of time we want the timer to time out at.
 	 * @param autostart whether the timer should autostart or not.
 	 */
-	public Odometer (EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, int INTERVAL, boolean autostart) {
+	public Odometer (EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, SampleProvider colorSensor, float[] colorValue, int INTERVAL, boolean autostart) {
 		
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
@@ -62,6 +66,9 @@ public class Odometer implements TimerListener {
 		this.oldDH = new double[2];
 		this.dDH = new double[2];
 
+		this.colorSensor = colorSensor;
+		this.colorValue = colorValue;
+		
 		if (autostart) {
 			// if the timeout interval is given as <= 0, default to 20ms timeout 
 			this.timer = new Timer((INTERVAL <= 0) ? INTERVAL : DEFAULT_TIMEOUT_PERIOD, this);
