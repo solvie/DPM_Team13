@@ -17,9 +17,10 @@ import lejos.utility.TimerListener;
  *  
  */
 
-public class Navigator extends Thread {
-	private static final int SLOWER_ROTATE = 30;
-	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, DEG_ERR = 2, D = 15;
+public class Navigator implements TimerListener{
+	public static final int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, D = 15, SLOWER_ROTATE = 30;
+	public static final double  DEG_ERR = 0.5;
+	private Timer timer;
 	private Odometer odo;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private Point2D[] knownObstacles;
@@ -27,6 +28,7 @@ public class Navigator extends Thread {
 	
 	public Navigator(Odometer odo){
 		this.odo = odo;
+		this.timer = new Timer(DEFAULT_TIMEOUT_PERIOD, this);
 		this.leftMotor = odo.getLeftMotor();
 		this.rightMotor = odo.getRightMotor();
 		this.thereIsObject = false;
@@ -34,6 +36,9 @@ public class Navigator extends Thread {
 		this.objectColorSeen = false;
 	}
 	
+	public void timedOut(){
+		//check ultrasonic data
+	}
 	
 	/* This method will make the robot go from its current point to the destination point travelling entirely along lines 
 	 * parallel to the x and y axis. At its base, it should travel from start to end the two tangent lines of the shortest distance vector
