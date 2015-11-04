@@ -1,4 +1,4 @@
-package navi;
+package naviUnit;
 
 /*
  * File: Odometer.java
@@ -41,7 +41,7 @@ public class Odometer implements TimerListener {
 	private double leftRadius, rightRadius, width;
 	private double x, y, theta;
 	private double[] oldDH, dDH;
-	private int flag;
+	private String flag;
 	
 	// constructor
 	public Odometer (EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, int INTERVAL, boolean autostart) {
@@ -50,7 +50,8 @@ public class Odometer implements TimerListener {
 		this.rightMotor = rightMotor;
 		this.rightRadius = 2.1;
 		this.leftRadius = 2.1;
-		this.width = 11.35; //at 7.2V
+		this.width = 18.3; //at 7.2V
+		this.flag = "";
 		
 		this.x = 0.0;
 		this.y = 0.0;
@@ -190,7 +191,12 @@ public class Odometer implements TimerListener {
 			return d - 360.0;
 	}
 	
-	public int getFlag(){
+	public void setFlag(String flag){
+		this.flag = flag;
+	}
+	
+	
+	public String getFlag(){
 		return flag;
 	}
 
