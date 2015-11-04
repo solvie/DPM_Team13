@@ -3,7 +3,9 @@ package robot;
 import lejos.robotics.SampleProvider;
 import lejos.utility.TimerListener;
 import lejos.utility.Timer;
-
+/*
+ * Here is the tiniest change I can think of. One I know this works, I will continue to use git properly!
+ */
 /**
  * The object detector class is responsible for using the ultrasonic sensor and the light sensor to detect
  * objects in front of the robot. 
