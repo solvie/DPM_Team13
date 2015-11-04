@@ -64,13 +64,16 @@ public class Navigator {
 	 */
 	public boolean travelToWithAvoidance(double x, double y){
 		double currX, currY, trajTheta, distance;
-		if (thereIsObjectWithinD) //if there is an object right at the start.
-			return true;
+
 		// calculate the amount of theta to turn, and turn by that amount
 		currX = odo.getX();
 		currY = odo.getY();
 		trajTheta = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
 		turnTo(trajTheta, true);
+		
+		if (thereIsObjectWithinD) //if there is an object right at the start.
+			return true;
+		
 		// calculate the distance that needs to be traveled, and go that distance
 		distance = Math.sqrt(Math.pow((y - currY), 2) + Math.pow((x - currX), 2));
 		leftMotor.setSpeed(FORWARD_SPEED);

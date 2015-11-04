@@ -63,15 +63,14 @@ public class PathFinder {
 			
 			if (pathBlocked1){
 				setOdoFlag(1);
-				pathBlocked2 = navi.travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
-				//obstacles = findPathTo(x, y, obstacles);
+				obstacles = findPathTo(x, y, obstacles);
 				//TODO: deal with hard case where there are two immediate blocks. 
 			}
 			else{
+				setOdoFlag(1);
 				pathBlocked2 =navi.travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
 				if (pathBlocked2){
-					pathBlocked1 = navi.travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
-					//obstacles = findPathTo(x, y, obstacles);
+					obstacles = findPathTo(x, y, obstacles);
 				}
 				else{
 					navi.stopMotors();
