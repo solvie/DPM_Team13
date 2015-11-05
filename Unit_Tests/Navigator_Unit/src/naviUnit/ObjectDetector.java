@@ -7,7 +7,7 @@ import lejos.utility.TimerListener;
 public class ObjectDetector implements TimerListener{
 	
 	public static final int errorMargin = 2, DELAY = 10, offFactor = 20;
-	private static final double OBJECT_CLOSE = 15, OBJECT_FAR = 90, MAX_RANGE = 120;
+	private static final double OBJECT_CLOSE = 7, OBJECT_FAR = 15, MAX_RANGE = 120;
 	private boolean objectDetected, objectClose, objectColorSeen, flagDetected;
 	private int i =0;
 	private SampleProvider usValue, colorValue;

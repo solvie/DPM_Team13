@@ -12,9 +12,9 @@ import lejos.robotics.geometry.Point2D;
 
 public class Robot {
 
-	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final Port usPort = LocalEV3.get().getPort("S1");		
+	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
+	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+	private static final Port usPort = LocalEV3.get().getPort("S4");		
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final int NUM_OBSTACLES = 20;
 	private static SensorModes usSensor, colorSensor;

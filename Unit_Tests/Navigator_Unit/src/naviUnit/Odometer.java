@@ -48,9 +48,9 @@ public class Odometer implements TimerListener {
 		
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
-		this.rightRadius = 2.1;
-		this.leftRadius = 2.1;
-		this.width = 18.3; //at 7.2V
+		this.rightRadius = 2.07;
+		this.leftRadius = 2.07;
+		this.width = 16.5; //at 7.2V
 		this.flag = "";
 		
 		this.x = 0.0;
