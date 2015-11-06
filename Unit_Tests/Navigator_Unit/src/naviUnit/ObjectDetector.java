@@ -1,22 +1,26 @@
 package naviUnit;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
 public class ObjectDetector implements TimerListener{
 	
-	public static final int errorMargin = 2, DELAY = 10, offFactor = 20;
-	private static final double OBJECT_CLOSE = 7, OBJECT_FAR = 15, MAX_RANGE = 120;
+	public static final int errorMargin = 2, DEFAULT_INTERVAL = 25, offFactor = 20;
+	private static final int OBJECT_CLOSE = 7, OBJECT_FAR = 15, MAX_RANGE = 120;
 	private boolean objectDetected, objectClose, objectColorSeen, flagDetected;
 	private int i =0;
 	private SampleProvider usValue, colorValue;
-	private int color, blockDetected;
+	private int color, blockDetected, distance, filter, filter_out = 10;
 	private float[] usData, colorData;
 	private Timer timer;
 	private Navigator navi;
 	private Odometer odo;
-	private double distance;
+	private ArrayList<Integer> Data = new ArrayList<Integer>();
 	
 	public ObjectDetector(Navigator navi, SampleProvider usValue, float[] usData,
 			SampleProvider colorValue, float[] colorData, boolean autostart) {
@@ -29,18 +33,15 @@ public class ObjectDetector implements TimerListener{
 		this.colorData = colorData;
 		this.navi = navi;
 		this.odo = null;
-		this.timer = new Timer(DELAY, this);
+		this.timer = new Timer(DEFAULT_INTERVAL, this);
 		if (autostart)
 			timer.start();
 	}
 	
 	public void timedOut(){
-		//Check sensor data every time 	the timer times out
-		usValue.fetchSample(usData,0);
-		distance = (usData[0] * 100);
-		//distance = filter(distance);
-		colorValue.fetchSample(colorData, 0);
-		//color = something.
+		synchronized(this){
+			distance = filter(distance);
+		}
 		//Tell the navi the information.
 		updateNavi(OBJECT_FAR, OBJECT_CLOSE);
 		}
@@ -48,6 +49,44 @@ public class ObjectDetector implements TimerListener{
 	public double filter(double distance){
 		//placeholder filtering method.
 		return distance;
+	}
+	
+	private int filter(int distance){
+		int lastdis=distance;
+				Data.clear();
+				for(int i=0;i<46;i++){
+					Data.add(this.getrawdistance());
+					Delay.usDelay(500);
+				}
+				Collections.sort(Data);
+				int currentdis=Data.get(Data.size()/2);
+				int diff=Math.abs(currentdis-lastdis);
+				if(diff>20 && filter<filter_out){
+					filter++;
+				}else{
+					distance=currentdis;
+					filter=0;
+				}
+				return distance;
+	}
+	
+	public int getrawdistance(){
+		synchronized (this){
+						usValue.fetchSample(usData, 0);
+						int rawdistance = (int)(usData[0]*100.0);
+						// filter infinity
+						if(rawdistance==Integer.MAX_VALUE){
+							rawdistance=255;}
+						return rawdistance;
+					}
+	}
+	
+	private int getcolor(){
+		synchronized(this){
+			colorValue.fetchSample(colorData, 0);
+			int color = (int) (colorData[0]*100);
+			return color;
+		}
 	}
 	
 	public void updateNavi(double farDist, double closeDist){
