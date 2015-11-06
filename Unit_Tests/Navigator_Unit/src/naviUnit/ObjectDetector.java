@@ -1,62 +1,52 @@
 package naviUnit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import lejos.robotics.SampleProvider;
-import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
 public class ObjectDetector implements TimerListener{
 	
-	private static final int DEFAULT_INTERVAL = 25, OBJECT_CLOSE = 15, OBJECT_FAR = 90;
+	public static final int errorMargin = 2, DELAY = 10, offFactor = 20;
+	private static final double OBJECT_CLOSE = 7, OBJECT_FAR = 15, MAX_RANGE = 120;
+	private boolean objectDetected, objectClose, objectColorSeen, flagDetected;
+	private int i =0;
+	private SampleProvider usValue, colorValue;
+	private int color, blockDetected;
+	private float[] usData, colorData;
+	private Timer timer;
 	private Navigator navi;
 	private Odometer odo;
-	private Timer timer;
-	private boolean objectDetected, objectClose, objectColorSeen, flagDetected;
-	private SampleProvider usSensor, colorSensor;
-	private int distance, filter;
-	private int filter_out=10;
-	private float[] usData, colorData;
-	private ArrayList<Integer> Data=new ArrayList<Integer>();
+	private double distance;
 	
 	public ObjectDetector(Navigator navi, SampleProvider usValue, float[] usData,
 			SampleProvider colorValue, float[] colorData, boolean autostart) {
+		this.objectDetected = false;
+		this.blockDetected = -1;
+		this.distance = MAX_RANGE; // initialize distance to farthest.
+		this.usValue = usValue;
+		this.colorValue = colorValue;
 		this.usData = usData;
 		this.colorData = colorData;
 		this.navi = navi;
 		this.odo = null;
-		this.timer = new Timer(DEFAULT_INTERVAL, this);
+		this.timer = new Timer(DELAY, this);
 		if (autostart)
 			timer.start();
 	}
 	
 	public void timedOut(){
 		//Check sensor data every time 	the timer times out
-		synchronized(this){
-			distance = filter(distance);
-		}
+		usValue.fetchSample(usData,0);
+		distance = (usData[0] * 100);
+		//distance = filter(distance);
+		colorValue.fetchSample(colorData, 0);
+		//color = something.
+		//Tell the navi the information.
 		updateNavi(OBJECT_FAR, OBJECT_CLOSE);
 		}
 	
-	public int filter(int distance){
-		int lastdis = distance;
-		Data.clear();
-		for(int i = 0; i<46; i++){
-			Data.add(this.getrawdistance());
-			Delay.usDelay(500);
-		}
-		Collections.sort(Data);
-		int currentdis = Data.get(Data.size()/2);
-		int diff = Math.abs(currentdis-lastdis);
-		if(diff>20 && filter<filter_out){
-			filter++;
-		}
-		else{
-			distance = currentdis;
-			filter = 0;
-		}
+	public double filter(double distance){
+		//placeholder filtering method.
 		return distance;
 	}
 	
@@ -87,26 +77,8 @@ public class ObjectDetector implements TimerListener{
 	public int[] getDistanceAndColor(){
 		int[] distanceNColor = new int[2];
 		distanceNColor[0] = (int) distance;
-		distanceNColor[1] = getcolor();
+		distanceNColor[1] = color;
 		return distanceNColor;
-	}
-	
-	public int getrawdistance(){
-		synchronized(this){
-			usSensor.fetchSample(usData, 0);
-			int rawdistance = (int)(usData[0]*100.0);
-			if (rawdistance==Integer.MAX_VALUE){
-				rawdistance = 255;}
-			return rawdistance;
-			}
-	}
-	
-	private int getcolor(){
-		synchronized(this){
-			colorSensor.fetchSample(colorData,0);
-			int color = (int)(colorData[0]*100);
-			return color;
-		}
 	}
 	
 	public Navigator getNavi(){
