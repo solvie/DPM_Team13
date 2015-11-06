@@ -42,6 +42,8 @@ public class PathFinder {
 		horizl = Math.abs(x - currX);
 		vertl = Math.abs(y - currY);
 		
+		boolean one;
+		
 		//set up wayPoints to travel the longer way first, UNLESS there is no obstacle immediately in front, in which case, travel to where there is no obstacle.
 		if (horizl-vertl>=0){
 			wayPoints[0] = new Point2D.Double(x, currY);
@@ -52,32 +54,50 @@ public class PathFinder {
 			wayPoints[1] = new Point2D.Double(x, y);
 		}
 		
+		// Set boolean true if waypoints are the same. 
+		if (wayPoints[0]==wayPoints[1])
+			one = false;
+		else
+			one = true;
+		
 		//TODO: modify travel to method so that if the destination it wants to travel to is within a centimeter of the current angle and whatever
 		//you stay put.
 		
-		boolean pathBlocked1, pathBlocked2;
-		if (!(((odo.getX()<x+DEG_ERR)&&(odo.getX()>x-DEG_ERR)) && ((odo.getY()<y+DEG_ERR)&&(odo.getY()>y-DEG_ERR)))){ //While we've not reached the destination, this happens. //TODO: modify so that there's more room for error.
-			//travel to the first point. If we try to travel there and don't reach the correct place, the same method is called again. 
-			setOdoFlag(0);
-			pathBlocked1 = navi.travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
-			
-			if (pathBlocked1){
-				setOdoFlag(1);
-				obstacles = findPathTo(x, y, obstacles);
-				//TODO: deal with hard case where there are two immediate blocks. 
-			}
-			else{
-				setOdoFlag(1);
-				pathBlocked2 =navi.travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
-				if (pathBlocked2){
+		if (!one){
+			boolean pathBlocked1, pathBlocked2;
+			if (!(((odo.getX()<x+DEG_ERR)&&(odo.getX()>x-DEG_ERR)) && ((odo.getY()<y+DEG_ERR)&&(odo.getY()>y-DEG_ERR)))){ //While we've not reached the destination, this happens. //TODO: modify so that there's more room for error.
+				//travel to the first point. If we try to travel there and don't reach the correct place, the same method is called again. 
+				setOdoFlag(0);
+				pathBlocked1 = navi.travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
+				
+				if (pathBlocked1){
+					setOdoFlag(1);
 					obstacles = findPathTo(x, y, obstacles);
+					//TODO: deal with hard case where there are two immediate blocks. 
 				}
 				else{
-					navi.stopMotors();
-					return obstacles;
-				}
-			}	
+					setOdoFlag(1);
+					pathBlocked2 =navi.travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
+					if (pathBlocked2){
+						obstacles = findPathTo(x, y, obstacles);
+					}
+					else{
+						navi.stopMotors();
+						return obstacles;
+					}
+				}	
+			}
 		}
+		else{ //this is the case where the robot is forced to go the sub-optimal direction because its path is blocked. 
+				//check left, go 20 if not blocked, check right, go 20 if not blocked. 
+				
+				// turn back facing forward, move the ultrasonic to face the block that's in the way move forwards until you don't see that block anymore
+				
+				//turn, move forward until you don't see that block anymore, 
+				
+				// call findPathTo again. 
+		}
+		
 		return obstacles;
 	}
 	
