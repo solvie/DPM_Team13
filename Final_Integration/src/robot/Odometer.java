@@ -1,12 +1,8 @@
 package robot;
 
-
-
-import lejos.robotics.SampleProvider;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
-import lejos.hardware.Button;
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
  * Class which controls the odometer for the robot
@@ -29,22 +25,23 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
  * 
  *  File: Odometer.java
  *  
- * @version 1.0
- * @author Sean Lawlor
- *
+ * @version 1.1
+ * @author Sean Lawlor 
+ * @author chouttle
  */
 public class Odometer implements TimerListener {
 
+	private EV3LargeRegulatedMotor leftMotor;
+	private EV3LargeRegulatedMotor rightMotor;
+
 	private Timer timer;
-	private EV3LargeRegulatedMotor leftMotor, rightMotor;
-	private SampleProvider colorSensor;
-	private float[] colorValue;
+	private int INTERVAL = 30;
 	private final int DEFAULT_TIMEOUT_PERIOD = 20;
-	private double leftRadius, rightRadius, width;
+
+	private double leftRadius, rightRadius, track;
 	private double x, y, theta;
 	private double[] oldDH, dDH;
-	private int flag;
-	
+
 	/**
 	 * Default constructor
 	 * @param leftMotor the left motor
@@ -52,46 +49,57 @@ public class Odometer implements TimerListener {
 	 * @param INTERVAL the interval of time we want the timer to time out at.
 	 * @param autostart whether the timer should autostart or not.
 	 */
-	public Odometer (EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, SampleProvider colorSensor, float[] colorValue, int INTERVAL, boolean autostart) {
-		
-		this.leftMotor = leftMotor;
-		this.rightMotor = rightMotor;
-		this.rightRadius = 2.1;
-		this.leftRadius = 2.1;
-		this.width = 11.35; //at 7.2V
-		
+	public Odometer(EV3LargeRegulatedMotor leftMotorO, EV3LargeRegulatedMotor rightMotorO) {
+		this.leftMotor = leftMotorO;
+		this.rightMotor = rightMotorO;
+
+		// default values, modify for your robot
+
+		this.leftRadius = 2.07;
+		this.rightRadius = 2.07;
+		this.track = 17.1;
+
+		/*		convention used: 
+		 *	robot facing the y axis is at theta = 90; 
+		 *	rotating from x axis to y axis (counter clockwise) 
+		 * 	means theta is rising
+		 * 
+		 */
 		this.x = 0.0;
 		this.y = 0.0;
 		this.theta = 90.0;
 		this.oldDH = new double[2];
 		this.dDH = new double[2];
 
-		this.colorSensor = colorSensor;
-		this.colorValue = colorValue;
-		
-		if (autostart) {
-			// if the timeout interval is given as <= 0, default to 20ms timeout 
-			this.timer = new Timer((INTERVAL <= 0) ? INTERVAL : DEFAULT_TIMEOUT_PERIOD, this);
-			this.timer.start();
-		} else
-			this.timer = null;
+		//creation of the correction, might need to run on a different thread???
+		final OdometerCorrection correctionOdo = new OdometerCorrection(this);
+		(new Thread(){
+			public void run(){
+				correctionOdo.run();
+			}
+		}).start();
+
+		//start the timer
+		this.timer = new Timer((INTERVAL <= 0) ? INTERVAL : DEFAULT_TIMEOUT_PERIOD, this);
+		this.timer.start();
 	}
-	
+
 	/**
-	 * Function to start the timerlistener
+	 * Function to stop the timerlistener
 	 */
 	public void stop() {
 		if (this.timer != null)
 			this.timer.stop();
 	}
+
 	/**
-	 * Function to stop the timerlistener
+	 * Function to start the timerlistener
 	 */
 	public void start() {
 		if (this.timer != null)
 			this.timer.start();
 	}
-	
+
 	/**
 	 * Calculates the displacement and heading of the robot
 	 * @param data displacement and heading
@@ -102,14 +110,13 @@ public class Odometer implements TimerListener {
 		rightTacho = rightMotor.getTachoCount();
 
 		data[0] = (leftTacho * leftRadius + rightTacho * rightRadius) * Math.PI / 360.0;
-		data[1] = (rightTacho * rightRadius - leftTacho * leftRadius) / width;
+		data[1] = (rightTacho * rightRadius - leftTacho * leftRadius) / track;
 	}
-	
+
 	/**
 	 * Recomputes the odometer values using the displacement and heading changes
 	 */
 	public void timedOut() {
-		
 		this.getDisplacementAndHeading(dDH);
 		dDH[0] -= oldDH[0];
 		dDH[1] -= oldDH[1];
@@ -193,23 +200,6 @@ public class Odometer implements TimerListener {
 			return new double[] { x, y, theta };
 		}
 	}
-	
-	/**
-	 * Accessor to motors
-	 * @return Left motor in index 0, right motor in index 1.
-	 */
-	public EV3LargeRegulatedMotor [] getMotors() {
-		return new EV3LargeRegulatedMotor[] {this.leftMotor, this.rightMotor};
-	}
-	
-	/**
-	 * Accessor for the odometer's timer
-	 * @return timer
-	 */
-	
-	public Timer getOdoTimer(){
-		return timer;
-	}
 
 	/**
 	 * This method corrects the angle such that it will not be a negative value
@@ -222,7 +212,7 @@ public class Odometer implements TimerListener {
 
 		return angle % 360.0;
 	}
-
+	
 	/**
 	 * This helper method calculates the minimum angle from a to b
 	 * @param a angle a
@@ -238,11 +228,7 @@ public class Odometer implements TimerListener {
 			return d - 360.0;
 	}
 	
-	/**
-	 * This method allows the user to set the value representing the width of the wheelbase
-	 * @param width the width of the wheelbase
-	 */
-	public void setWidth(double width){
-		this.width = width;
+	public EV3LargeRegulatedMotor[] getMotors(){
+		return new EV3LargeRegulatedMotor[]{this.leftMotor, this.rightMotor};
 	}
 }

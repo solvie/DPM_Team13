@@ -60,7 +60,7 @@ public class Robot {
 		display = new Display();
 		display.setPart(0);
 		
-		odo = new Odometer(leftMotor, rightMotor, colorValue2, colorData2, 20, true);
+		odo = new Odometer(leftMotor, rightMotor);
 		navi = new Navigator(odo);
 		obDetector = new ObjectDetector(navi, usValue, usData, colorValue, colorData, true);
 		

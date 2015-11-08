@@ -42,58 +42,6 @@ public class Navigator {
 	
 	
 	/**
-	 * This method will make the robot go from its current point to the destination point travelling entirely along lines 
-	 * parallel to the x and y axis. At its base, it should travel from start to end the two tangent lines of the shortest distance vector
-	 * unless a block gets in its way. It should also keep track of where all the blocks were detected, so that its return journey is easier.
-	 * @param x X coordinate of destination point
-	 * @param y Y coordinate of destination point
-	 * @param obstacles empty array of 2D points that will be filled with coordinates of obstacles by the end of the method.
-	 * @return Point2D[] an array of 2D points that describe the positions of the obstacles
-	 */
-	public Point2D[] squareTravel(double x, double y, Point2D[] obstacles){
-		//TODO: commented out for now.
-		/*double currX, currY, currTheta, horizl, vertl;
-		boolean longerDistanceAppropriate;
-		Point2D[] wayPoints = new Point2D[2];
-		currX = odo.getX();
-		currY = odo.getY();
-		currTheta = odo.getAng();
-		
-		horizl = Math.abs(x - currX);
-		vertl = Math.abs(y - currY);
-		//set up wayPoints to travel the longer way first
-		
-		if (horizl-vertl>=0){
-			wayPoints[0] = new Point2D.Double(x, currY);
-			wayPoints[1] = new Point2D.Double(x, y);
-		}
-		else{
-			wayPoints[0] = new Point2D.Double(currX, y);
-			wayPoints[1] = new Point2D.Double(x, y);
-		}
-		
-		//TODO: modify travel to method so that if the destination it wants to travel to is within a centimeter of the current angle and whatever
-		//you stay put.
-		boolean pathBlocked1, pathBlocked2;
-		
-		if (!(odo.getX()==x && odo.getY()==y)){ //While we've not reached the destination, this happens. //TODO: modify so that there's more room for error.
-			//travel to the first point. If we try to travel there and don't reach the correct place, the same method is called again. 
-			pathBlocked1 = travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
-			pathBlocked2 = travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
-			if (pathBlocked1&&!pathBlocked2) // if it reaches the end of the path and the first one had been blocked, try to travel the first path again. 
-				pathBlocked1 = travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
-			if (pathBlocked1 &&pathBlocked2){
-				//TODO: try to move around the block. 
-			}
-		}
-		else{ //base case
-			leftMotor.stop(true);
-			rightMotor.stop(true);
-		}*/
-		return obstacles;
-	}
-	
-	/**
 	 * The conventional method of travelling to a point; calculates and turns to the heading it must face and drives the distance
 	 * that it must go to arrive at the destination described by input points. May be deprecated.
 	 * @param x X coordinate of destination
