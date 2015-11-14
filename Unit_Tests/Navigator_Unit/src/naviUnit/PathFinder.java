@@ -43,33 +43,43 @@ public class PathFinder {
 		vertl = Math.abs(y - currY);
 		
 		//set up wayPoints to travel the longer way first, UNLESS there is no obstacle immediately in front, in which case, travel to where there is no obstacle.
-		if (horizl-vertl>=0){
+		if (horizl-vertl>0){
 			wayPoints[0] = new Point2D.Double(x, currY);
 			wayPoints[1] = new Point2D.Double(x, y);
+		
 		}
 		else{
 			wayPoints[0] = new Point2D.Double(currX, y);
 			wayPoints[1] = new Point2D.Double(x, y);
+		
 		}
 		
 		//TODO: modify travel to method so that if the destination it wants to travel to is within a centimeter of the current angle and whatever
 		//you stay put.
 		
-		boolean pathBlocked1, pathBlocked2;
+		boolean [] pathBlocked1, pathBlocked2;
 		if (!(((odo.getX()<x+DEG_ERR)&&(odo.getX()>x-DEG_ERR)) && ((odo.getY()<y+DEG_ERR)&&(odo.getY()>y-DEG_ERR)))){ //While we've not reached the destination, this happens. //TODO: modify so that there's more room for error.
 			//travel to the first point. If we try to travel there and don't reach the correct place, the same method is called again. 
 			setOdoFlag(0);
 			pathBlocked1 = navi.travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
+			if (pathBlocked1[0]){ // if there is an obstacle immediately in front, flip the waypoints
+				if (wayPoints[0].getX() ==x && wayPoints[0].getY()==currY)
+					wayPoints[0] = new Point2D.Double(currX, y);
+				else
+					wayPoints[0] = new Point2D.Double(x, currY);
+			}
 			
-			if (pathBlocked1){
+			if (pathBlocked1[1]){
+				Sound.beep();
 				setOdoFlag(1);
 				obstacles = findPathTo(x, y, obstacles);
-				//TODO: deal with hard case where there are two immediate blocks. 
+				
 			}
 			else{
 				setOdoFlag(1);
 				pathBlocked2 =navi.travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
-				if (pathBlocked2){
+				if (pathBlocked2[1]){
+					Sound.beep();
 					obstacles = findPathTo(x, y, obstacles);
 				}
 				else{

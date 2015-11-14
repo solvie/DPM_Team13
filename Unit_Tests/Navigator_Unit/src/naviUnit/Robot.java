@@ -15,12 +15,14 @@ public class Robot {
 
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3LargeRegulatedMotor sensorMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");		
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
+	//private static final Port fixedUsPort = LocalEV3.get().getPort("S3");
 	private static final int NUM_OBSTACLES = 20;
-	private static SensorModes usSensor, colorSensor;
-	private static SampleProvider usValue, colorValue;
-	private static float[] usData, colorData;
+	private static SensorModes usSensor, fixedUsSensor, colorSensor;
+	private static SampleProvider usValue, fixedUsValue, colorValue;
+	private static float[] usData, fixedUsData, colorData;
 	private static Odometer odo;
 	private static Navigator navi;
 	private static ObjectDetector obDetector;
@@ -31,6 +33,10 @@ public class Robot {
 		usSensor = new EV3UltrasonicSensor(usPort);
 		usValue = usSensor.getMode("Distance");
 		usData = new float[usValue.sampleSize()];
+		
+	/*	fixedUsSensor = new EV3UltrasonicSensor(fixedUsPort);
+		fixedUsValue = fixedUsSensor.getMode("Distance");
+		fixedUsData = new float[fixedUsValue.sampleSize()];*/
 		
 		//Set up the color sensor
 		colorSensor = new EV3ColorSensor(colorPort);
