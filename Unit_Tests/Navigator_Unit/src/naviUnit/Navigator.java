@@ -62,8 +62,10 @@ public class Navigator {
 	 * and stop when it is a certain distance away from it. (TODO: define that distance, maybe pass it in as a parameter)
 	 *
 	 */
-	public boolean travelToWithAvoidance(double x, double y){
+	public boolean[] travelToWithAvoidance(double x, double y){
 		double currX, currY, trajTheta, distance;
+		boolean fromGetGo = false, alongJourney = false;
+		boolean[] result= new boolean[2];
 
 		// calculate the amount of theta to turn, and turn by that amount
 		currX = odo.getX();
@@ -71,8 +73,11 @@ public class Navigator {
 		trajTheta = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
 		turnTo(trajTheta, true);
 		
-		if (thereIsObjectWithinD) //if there is an object right at the start.
-			return true;
+		if (thereIsObjectWithinD){ //if there is an object right at the start.
+			result[0] = true;
+			result[1] = true;
+			return result;
+		}
 		
 		// calculate the distance that needs to be traveled, and go that distance
 		distance = Math.sqrt(Math.pow((y - currY), 2) + Math.pow((x - currX), 2));
@@ -90,14 +95,17 @@ public class Navigator {
 					if (thereIsObjectWithinD){
 						leftMotor.stop(true);
 						rightMotor.stop(true);
-						return true;
+						result[0] = false;
+						result[1] = true;
+						return result;
 					}
 				}
 		}
 		leftMotor.stop(true);
 		rightMotor.stop(true);
-		
-		return false;
+		result[0] = false;
+		result[1] = false;
+		return result;
 	}
 	
 	/*
