@@ -55,9 +55,9 @@ public class Odometer implements TimerListener {
 
 		// default values, modify for your robot
 
-		this.leftRadius = 2.07;
-		this.rightRadius = 2.07;
-		this.track = 17.1;
+		this.leftRadius = 2.04;
+		this.rightRadius = 2.04;
+		this.track = 15.5;
 
 		/*		convention used: 
 		 *	robot facing the y axis is at theta = 90; 
@@ -212,7 +212,7 @@ public class Odometer implements TimerListener {
 
 		return angle % 360.0;
 	}
-	
+
 	/**
 	 * This helper method calculates the minimum angle from a to b
 	 * @param a angle a
@@ -226,5 +226,22 @@ public class Odometer implements TimerListener {
 			return d;
 		else
 			return d - 360.0;
+	}
+
+	/**
+	 * Accessor to motors
+	 * @return Left motor in index 0, right motor in index 1.
+	 */
+	public EV3LargeRegulatedMotor [] getMotors() {
+		return new EV3LargeRegulatedMotor[] {this.leftMotor, this.rightMotor};
+	}
+
+	/**
+	 * Accessor for the odometer's timer
+	 * @return timer
+	 */
+
+	public Timer getOdoTimer(){
+		return timer;
 	}
 }

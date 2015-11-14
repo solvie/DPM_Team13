@@ -28,11 +28,11 @@ public class OdometerCorrection {
 	float[] lightData = new float[lightSensor.sampleSize()];
 
 	//FILTERING
-	int filterSize = 8;
+	int filterSize = 5;
 	int filterPointer = 0;
 	double[] lightArray = new double[filterSize];
 
-	private double distSensorCenter = 7;
+	private double distSensorCenter = 11.3;
 	private double distBtwLines = 30.48;
 
 	/**
@@ -51,6 +51,8 @@ public class OdometerCorrection {
 		double currentX = odo.getX()-distSensorCenter;
 		double currentY = odo.getY()-distSensorCenter;
 		double currentAng = odo.getAng();
+		int errorAngAllowed = 4;
+		int errorMarginBefore = 12;
 		while(true){
 			lightValue = getFilteredLightData();
 			currentX = odo.getX()-distSensorCenter;
@@ -59,17 +61,17 @@ public class OdometerCorrection {
 			boolean[] update = {false, false, false};
 			double[] position = new double[3];
 			if(lineDetected(lightValue)){
-				if(isPlusMinus(currentAng, 2, 90) || isPlusMinus(currentAng, 2, 270)){
+				if(isPlusMinus(currentAng, errorAngAllowed, 90) || isPlusMinus(currentAng, errorAngAllowed, 270)){
 					//y axis case
-					if(isPlusMinus(currentY, 5, (int) distBtwLines)){
+					if(isPlusMinus(currentY, errorMarginBefore, (int) distBtwLines)){
 						update[1] = true;
 						position[1] = adaptValue(currentY, distBtwLines);
 						Sound.beep();
 					}
 				}
-				if(isPlusMinus(currentAng, 2, 180) || isPlusMinus(currentAng, 2, 0) || isPlusMinus(currentAng, 2, 360)){
+				if(isPlusMinus(currentAng, errorAngAllowed, 180) || isPlusMinus(currentAng, errorAngAllowed, 0) || isPlusMinus(currentAng, errorAngAllowed, 360)){
 					//x axis case
-					if(isPlusMinus(currentX, 5, (int) distBtwLines)){
+					if(isPlusMinus(currentX, errorMarginBefore, (int) distBtwLines)){
 						update[0] = true;
 						position[0] = adaptValue(currentX, distBtwLines);
 						Sound.beep();
