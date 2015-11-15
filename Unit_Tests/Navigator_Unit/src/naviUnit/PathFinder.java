@@ -43,33 +43,68 @@ public class PathFinder {
 		vertl = Math.abs(y - currY);
 		
 		//set up wayPoints to travel the longer way first, UNLESS there is no obstacle immediately in front, in which case, travel to where there is no obstacle.
+<<<<<<< HEAD
+		if (horizl-vertl>0){
+			wayPoints[0] = new Point2D.Double(x, currY);
+			wayPoints[1] = new Point2D.Double(x, y);
+		
+=======
 		if (horizl-vertl>=0){
 			wayPoints[0] = new Point2D.Double(x, currY);
 			wayPoints[1] = new Point2D.Double(x, y);
+>>>>>>> origin/master
 		}
 		else{
 			wayPoints[0] = new Point2D.Double(currX, y);
 			wayPoints[1] = new Point2D.Double(x, y);
+<<<<<<< HEAD
+		
+=======
+>>>>>>> origin/master
 		}
 		
 		//TODO: modify travel to method so that if the destination it wants to travel to is within a centimeter of the current angle and whatever
 		//you stay put.
 		
+<<<<<<< HEAD
+		boolean [] pathBlocked1, pathBlocked2;
+=======
 		boolean pathBlocked1, pathBlocked2;
+>>>>>>> origin/master
 		if (!(((odo.getX()<x+DEG_ERR)&&(odo.getX()>x-DEG_ERR)) && ((odo.getY()<y+DEG_ERR)&&(odo.getY()>y-DEG_ERR)))){ //While we've not reached the destination, this happens. //TODO: modify so that there's more room for error.
 			//travel to the first point. If we try to travel there and don't reach the correct place, the same method is called again. 
 			setOdoFlag(0);
 			pathBlocked1 = navi.travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
+<<<<<<< HEAD
+			if (pathBlocked1[0]){ // if there is an obstacle immediately in front, flip the waypoints
+				if (wayPoints[0].getX() ==x && wayPoints[0].getY()==currY)
+					wayPoints[0] = new Point2D.Double(currX, y);
+				else
+					wayPoints[0] = new Point2D.Double(x, currY);
+			}
+			
+			if (pathBlocked1[1]){
+				Sound.beep();
+				setOdoFlag(1);
+				obstacles = findPathTo(x, y, obstacles);
+				
+=======
 			
 			if (pathBlocked1){
 				setOdoFlag(1);
 				obstacles = findPathTo(x, y, obstacles);
 				//TODO: deal with hard case where there are two immediate blocks. 
+>>>>>>> origin/master
 			}
 			else{
 				setOdoFlag(1);
 				pathBlocked2 =navi.travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
+<<<<<<< HEAD
+				if (pathBlocked2[1]){
+					Sound.beep();
+=======
 				if (pathBlocked2){
+>>>>>>> origin/master
 					obstacles = findPathTo(x, y, obstacles);
 				}
 				else{
