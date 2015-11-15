@@ -9,13 +9,13 @@ import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
-/**
+/** 
  * Class controlling the correction of the odometer whenever the robot
  * goes past a line
  * The correction is only made if the robot is going along either the x or y axis.
- * @version 1.0
+ * The correction is not activated whenever the robot navigates on a coordinates that should represent a continuous line.
+ * @version 2.0
  * @author chouttle
- *
  */
 public class OdometerCorrection {
 	private Odometer odo;
@@ -23,7 +23,6 @@ public class OdometerCorrection {
 	//LIGHT SENSOR
 	private static final Port lightPort = LocalEV3.get().getPort("S3");
 	SensorModes lightSensor = new EV3ColorSensor(lightPort);
-//	EV3ColorSensor lightSensor = new EV3ColorSensor(lightPort);
 	SampleProvider lightSample = lightSensor.getMode("Red");
 	float[] lightData = new float[lightSensor.sampleSize()];
 
@@ -42,45 +41,50 @@ public class OdometerCorrection {
 	public OdometerCorrection(Odometer odoO) {
 		this.odo = odoO;
 	}
-	
+
 	/**
-	 * Function to start the correction of the odometer.
+	 * Function executing the correction of the odometer.
 	 */
 	public void run(){
-		double lightValue = getFilteredLightData();
+
 		double currentX = odo.getX()-distSensorCenter;
 		double currentY = odo.getY()-distSensorCenter;
 		double currentAng = odo.getAng();
 		int errorAngAllowed = 4;
-		int errorMarginBefore = 12;
+		int errorMarginBefore = 15;
 		while(true){
-			lightValue = getFilteredLightData();
 			currentX = odo.getX()-distSensorCenter;
 			currentY = odo.getY()-distSensorCenter;
 			currentAng = odo.getAng();
 			boolean[] update = {false, false, false};
 			double[] position = new double[3];
-			if(lineDetected(lightValue)){
-				if(isPlusMinus(currentAng, errorAngAllowed, 90) || isPlusMinus(currentAng, errorAngAllowed, 270)){
+			if(lineDetected(getFilteredLightData())){
+				if((isInRangeAngle(currentAng, errorAngAllowed, 90) || isInRangeAngle(currentAng, errorAngAllowed, 270)) && !isOnALine(currentX, 2)){
 					//y axis case
-					if(isPlusMinus(currentY, errorMarginBefore, (int) distBtwLines)){
+					if(isInRangeCoo(currentY, errorMarginBefore, (int) distBtwLines)){
+						System.out.println("Great");
 						update[1] = true;
-						position[1] = adaptValue(currentY, distBtwLines);
+						position[1] = adaptValue(currentY, distBtwLines) + distSensorCenter;
 						Sound.beep();
+						odo.setPosition(position, update);
+						sleep(1000);
 					}
 				}
-				if(isPlusMinus(currentAng, errorAngAllowed, 180) || isPlusMinus(currentAng, errorAngAllowed, 0) || isPlusMinus(currentAng, errorAngAllowed, 360)){
+				if((isInRangeAngle(currentAng, errorAngAllowed, 180) || isInRangeAngle(currentAng, errorAngAllowed, 0) || isInRangeAngle(currentAng, errorAngAllowed, 360)) && !isOnALine(currentY, 2)){
 					//x axis case
-					if(isPlusMinus(currentX, errorMarginBefore, (int) distBtwLines)){
+					if(isInRangeCoo(currentX, errorMarginBefore, (int) distBtwLines)){
+						System.out.println("Freat");
 						update[0] = true;
-						position[0] = adaptValue(currentX, distBtwLines);
+						position[0] = adaptValue(currentX, distBtwLines) + distSensorCenter;
 						Sound.beep();
+						odo.setPosition(position, update);
+						sleep(1000);
 					}
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Function checking if a number is within the range of a target number
 	 * @param number
@@ -88,10 +92,35 @@ public class OdometerCorrection {
 	 * @param target
 	 * @return true if the value is within the range, false otherwise
 	 */
-	private boolean isPlusMinus(double number, int range, int target){
-		if(number%target <range && number%target>-range)
+	private boolean isInRangeAngle(double number, int range, int target){
+		if(Math.abs(number-target) <range)
 			return true;
 		return false;
+	}
+
+	/**
+	 * Function checking if a number is within the range of a the multiple of a target number
+	 * @param number
+	 * @param range
+	 * @param target
+	 * @return
+	 */
+	private boolean isInRangeCoo(double number, int range, int target){
+		if(Math.abs((number%target)-target) <range)
+			return true;
+		return false;
+	}
+
+	/**
+	 * Function checking if the robot is navigating on a continuous line.
+	 * @param xOrY current x or y coordinates of the robot
+	 * @param range small range representing the possible error of the odometer if close to the line
+	 * @return
+	 */
+	private boolean isOnALine(double xOrY, int range){
+		if(xOrY%distBtwLines<distBtwLines/2)
+			return xOrY%distBtwLines < range;
+		return Math.abs(xOrY%distBtwLines - distBtwLines) < range;
 	}
 
 	/**
@@ -105,7 +134,7 @@ public class OdometerCorrection {
 			return number - number%multiplier;
 		return number + Math.abs(number%multiplier - multiplier);
 	}
-	
+
 	/**
 	 * Checks if a line is being detected by the light sensor
 	 * @param value value of the light sensor
@@ -116,7 +145,7 @@ public class OdometerCorrection {
 			return true;
 		return false;
 	}
-	
+
 	/**
 	 * This function filters out the data received from the light sensor using a median filter
 	 * @param light data received from the light sensor
@@ -162,7 +191,7 @@ public class OdometerCorrection {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * This function fetches the sample and filters the data
 	 * @return the light data
