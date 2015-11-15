@@ -62,9 +62,14 @@ public class Navigator {
 	 * and stop when it is a certain distance away from it. (TODO: define that distance, maybe pass it in as a parameter)
 	 *
 	 */
+<<<<<<< HEAD
 	public boolean [] travelToWithAvoidance(double x, double y){
 		double currX, currY, trajTheta, distance;
 		boolean[] result= new boolean[2];
+=======
+	public boolean travelToWithAvoidance(double x, double y){
+		double currX, currY, trajTheta, distance;
+>>>>>>> origin/master
 
 		// calculate the amount of theta to turn, and turn by that amount
 		currX = odo.getX();
@@ -72,11 +77,17 @@ public class Navigator {
 		trajTheta = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
 		turnTo(trajTheta, true);
 		
+<<<<<<< HEAD
 		if (thereIsObjectWithinD) { //if there is an object right at the start.
 			result[0] = true;
 			result[1] = true;
 			return result;
 		}
+=======
+		if (thereIsObjectWithinD) //if there is an object right at the start.
+			return true;
+		
+>>>>>>> origin/master
 		// calculate the distance that needs to be traveled, and go that distance
 		distance = Math.sqrt(Math.pow((y - currY), 2) + Math.pow((x - currX), 2));
 		leftMotor.setSpeed(FORWARD_SPEED);
@@ -93,24 +104,37 @@ public class Navigator {
 					if (thereIsObjectWithinD){
 						leftMotor.stop(true);
 						rightMotor.stop(true);
+<<<<<<< HEAD
 						result[0] = false;
 						result[1] = true;
 						return result;
+=======
+						return true;
+>>>>>>> origin/master
 					}
 				}
 		}
 		leftMotor.stop(true);
 		rightMotor.stop(true);
+<<<<<<< HEAD
 		result[0] = false;
 		result[1] = false;
 		return result;
+=======
+		
+		return false;
+>>>>>>> origin/master
 	}
 	
 	/*
 	 * This method turns the robot in place to face the specified destination heading.
 	 */
 	public void turnTo(double theta, boolean stop) {
+<<<<<<< HEAD
 		double error = theta - odo.getAng();
+=======
+		double error = theta - this.odo.getAng();
+>>>>>>> origin/master
 		while (Math.abs(error)> DEG_ERR){
 			error = theta - this.odo.getAng();
 			
