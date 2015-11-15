@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 // VERSION THAT WORKS
-=======
->>>>>>> origin/master
 package naviUnit;
 
 import lejos.hardware.Button;
@@ -18,7 +15,6 @@ public class Robot {
 
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-<<<<<<< HEAD
 	private static final EV3LargeRegulatedMotor sensorMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");		
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
@@ -27,14 +23,6 @@ public class Robot {
 	private static SensorModes usSensor, fixedUsSensor, colorSensor;
 	private static SampleProvider usValue, fixedUsValue, colorValue;
 	private static float[] usData, fixedUsData, colorData;
-=======
-	private static final Port usPort = LocalEV3.get().getPort("S4");		
-	private static final Port colorPort = LocalEV3.get().getPort("S2");
-	private static final int NUM_OBSTACLES = 20;
-	private static SensorModes usSensor, colorSensor;
-	private static SampleProvider usValue, colorValue;
-	private static float[] usData, colorData;
->>>>>>> origin/master
 	private static Odometer odo;
 	private static Navigator navi;
 	private static ObjectDetector obDetector;
@@ -46,13 +34,10 @@ public class Robot {
 		usValue = usSensor.getMode("Distance");
 		usData = new float[usValue.sampleSize()];
 		
-<<<<<<< HEAD
 	/*	fixedUsSensor = new EV3UltrasonicSensor(fixedUsPort);
 		fixedUsValue = fixedUsSensor.getMode("Distance");
 		fixedUsData = new float[fixedUsValue.sampleSize()];*/
 		
-=======
->>>>>>> origin/master
 		//Set up the color sensor
 		colorSensor = new EV3ColorSensor(colorPort);
 		colorValue = colorSensor.getMode("ColorID");//TODO: change mode?
@@ -60,7 +45,7 @@ public class Robot {
 		
 		//Set up block detector
 		odo = new Odometer(leftMotor, rightMotor, 20, true);
-		navi = new Navigator(odo);
+		navi = new Navigator(odo, sensorMotor);
 		obDetector = new ObjectDetector(navi, usValue, usData, colorValue, colorData, false);
 		
 		//Set up display

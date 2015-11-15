@@ -11,20 +11,21 @@ import lejos.robotics.geometry.Point2D;
  */
 
 public class Navigator {
-	private static final int SLOWER_ROTATE = 30;
+	private static final int SLOWER_ROTATE = 30, BUFFER_TIME = 500, ESCAPE_DIST = 30;
 	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, DEG_ERR = 2, D = 15;
 	private Odometer odo;
-	private EV3LargeRegulatedMotor leftMotor, rightMotor;
+	private EV3LargeRegulatedMotor leftMotor, rightMotor, sensorMotor;
 	private Point2D[] knownObstacles;
 	private boolean thereIsObject, thereIsObjectWithinD, objectColorSeen;
 	
 	/*
 	 * Default constructor
 	 */
-	public Navigator(Odometer odo){
+	public Navigator(Odometer odo, EV3LargeRegulatedMotor sensorMotor){
 		this.odo = odo;
 		this.leftMotor = odo.getMotors()[0];
 		this.rightMotor = odo.getMotors()[1];
+		this.sensorMotor = sensorMotor;
 		this.thereIsObject = false;
 		this.thereIsObjectWithinD = false;
 		this.objectColorSeen = false;
@@ -62,14 +63,9 @@ public class Navigator {
 	 * and stop when it is a certain distance away from it. (TODO: define that distance, maybe pass it in as a parameter)
 	 *
 	 */
-<<<<<<< HEAD
 	public boolean [] travelToWithAvoidance(double x, double y){
 		double currX, currY, trajTheta, distance;
 		boolean[] result= new boolean[2];
-=======
-	public boolean travelToWithAvoidance(double x, double y){
-		double currX, currY, trajTheta, distance;
->>>>>>> origin/master
 
 		// calculate the amount of theta to turn, and turn by that amount
 		currX = odo.getX();
@@ -77,17 +73,11 @@ public class Navigator {
 		trajTheta = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
 		turnTo(trajTheta, true);
 		
-<<<<<<< HEAD
 		if (thereIsObjectWithinD) { //if there is an object right at the start.
 			result[0] = true;
 			result[1] = true;
 			return result;
 		}
-=======
-		if (thereIsObjectWithinD) //if there is an object right at the start.
-			return true;
-		
->>>>>>> origin/master
 		// calculate the distance that needs to be traveled, and go that distance
 		distance = Math.sqrt(Math.pow((y - currY), 2) + Math.pow((x - currX), 2));
 		leftMotor.setSpeed(FORWARD_SPEED);
@@ -104,37 +94,81 @@ public class Navigator {
 					if (thereIsObjectWithinD){
 						leftMotor.stop(true);
 						rightMotor.stop(true);
-<<<<<<< HEAD
 						result[0] = false;
 						result[1] = true;
 						return result;
-=======
-						return true;
->>>>>>> origin/master
 					}
 				}
 		}
 		leftMotor.stop(true);
 		rightMotor.stop(true);
-<<<<<<< HEAD
 		result[0] = false;
 		result[1] = false;
 		return result;
-=======
+	}
+	
+	/*
+	 * This method will have the robot travelling forward with the sensor facing sideways facing an obstacle.
+	 * Once the robot no longer sees the obstacle, it will stop.
+	 */
+	public void travelUntilNoObstacle(boolean left){ //the boolean defines the empty path direction.
+		double currTheta = odo.getAng(), destAngle;
+		sensorMotor.setAcceleration(2000);
+		//turn the sensormotor and the robot to the right direction
+		if (left){
+			sensorMotor.rotate(-90);
+			destAngle = (currTheta+90.0)%360;
+			turnTo(destAngle, true);
+		}
+		else{
+			sensorMotor.rotate(90);
+			destAngle = (currTheta-90.0);
+			if (destAngle<0)
+				destAngle = destAngle + 360;
+			turnTo(destAngle, true);	
+		}
 		
-		return false;
->>>>>>> origin/master
+		//go forward until there is no obstacle detected.
+		setSpeeds(HALF_SPEED, HALF_SPEED);
+		leftMotor.forward();
+		rightMotor.forward();
+		try {Thread.sleep(BUFFER_TIME);
+		} catch (InterruptedException e) {e.printStackTrace();}
+		while (true){
+			leftMotor.forward();
+			rightMotor.forward();
+			if (!thereIsObject)
+				break;
+		}
+		//let the robot's body move past the obstacle before stopping.
+		try{ Thread.sleep(BUFFER_TIME*5);
+		} catch(InterruptedException e) {e.printStackTrace();}
+		stopMotors();	
+		
+		//put sensor back in proper locations, turn, and then 
+		if (left){
+			sensorMotor.rotate(90);
+			destAngle = (currTheta-90.0);
+			if (destAngle<0)
+				destAngle = destAngle + 360;
+			turnTo(destAngle, true);
+		}
+		else{
+			sensorMotor.rotate(-90);
+			destAngle = (currTheta+90.0)%360;
+			turnTo(destAngle, true);
+			
+		}
+		
+		//travel forward some distance
+		travelForwards(ESCAPE_DIST);
 	}
 	
 	/*
 	 * This method turns the robot in place to face the specified destination heading.
 	 */
 	public void turnTo(double theta, boolean stop) {
-<<<<<<< HEAD
 		double error = theta - odo.getAng();
-=======
-		double error = theta - this.odo.getAng();
->>>>>>> origin/master
 		while (Math.abs(error)> DEG_ERR){
 			error = theta - this.odo.getAng();
 			
@@ -153,6 +187,63 @@ public class Navigator {
 			this.setSpeeds(0, 0);
 		}
 
+	}
+	
+	public boolean[] scan(){
+		//look left
+		boolean[] info = new boolean[2]; // first is whether its empty, second is direction (left is true)
+		sensorMotor.setAcceleration(2000);
+		sensorMotor.rotate(90);
+		try {Thread.sleep(200);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
+		if (thereIsObject){
+			sensorMotor.rotate(-180);
+			try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
+			if (thereIsObject){
+				info[0] = false;
+				info[1] = false;
+			}
+			else{
+				info[0] = true;
+				info[1] = false;
+			}
+		}
+		else{
+			info[0] = true;
+			info[1] = true;
+		}
+		return info;
+	}
+	
+	public void travelBackwards(int distance){
+		double currX, currY;
+		currX = odo.getX();
+		currY = odo.getY();
+		while(Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance){
+			leftMotor.setSpeed(HALF_SPEED);
+			rightMotor.setSpeed(HALF_SPEED);
+			leftMotor.backward();
+			rightMotor.backward();
+		}
+		leftMotor.stop(true);
+		rightMotor.stop(true);
+		
+	}
+	
+	public void travelForwards(int distance){
+		double currX, currY;
+		currX = odo.getX();
+		currY = odo.getY();
+		while(Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance){
+			leftMotor.setSpeed(HALF_SPEED);
+			rightMotor.setSpeed(HALF_SPEED);
+			leftMotor.forward();
+			rightMotor.forward();
+			if (thereIsObject)
+				break;
+		}
+		leftMotor.stop(true);
+		rightMotor.stop(true);
+		
 	}
 	
 	public void setSpeeds(float lSpd, float rSpd) {
