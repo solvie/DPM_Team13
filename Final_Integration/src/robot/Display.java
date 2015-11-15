@@ -7,7 +7,8 @@ import lejos.utility.TimerListener;
 /**
  * This class will display data such as the robot's position and whether there is an object in front of it.
  * 
- * @version 0.0
+ * @version 0.5
+ * @author Solvie Lee
  */
 public class Display implements TimerListener {
 

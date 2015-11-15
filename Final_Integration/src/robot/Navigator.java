@@ -15,7 +15,7 @@ import lejos.robotics.geometry.Point2D;
  * information at various intervals, from an outside class. 
  * 
  * @author Solvie Lee
- * @version 1.0
+ * @version 1.1
  * 
  */
 
@@ -23,7 +23,7 @@ public class Navigator {
 	private static final int SLOWER_ROTATE = 30;
 	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, DEG_ERR = 2, D = 15;
 	private Odometer odo;
-	private EV3LargeRegulatedMotor leftMotor, rightMotor;
+	private EV3LargeRegulatedMotor leftMotor, rightMotor, sensorMotor;
 	private Point2D[] knownObstacles;
 	private boolean thereIsObject, thereIsObjectWithinD, objectColorSeen;
 	
@@ -31,10 +31,11 @@ public class Navigator {
 	 * Default constructor
 	 * @param odo the odometer that will provide position data to the navigator.
 	 */
-	public Navigator(Odometer odo){
+	public Navigator(Odometer odo, EV3LargeRegulatedMotor sensorMotor){
 		this.odo = odo;
 		this.leftMotor = odo.getMotors()[0];
 		this.rightMotor = odo.getMotors()[1];
+		this.sensorMotor = sensorMotor;
 		this.thereIsObject = false;
 		this.thereIsObjectWithinD = false;
 		this.objectColorSeen = false;
@@ -54,7 +55,7 @@ public class Navigator {
 		currY = odo.getY();
 		trajTheta = getArcTan(x, y, currX, currY);
 		
-		turnTo(trajTheta);
+		turnTo(trajTheta, true);
 		// calculate the distance that needs to be traveled, and go that distance
 		distance = Math.sqrt(Math.pow((y - currY), 2) + Math.pow((x - currX), 2));
 		leftMotor.setSpeed(FORWARD_SPEED);
@@ -76,20 +77,26 @@ public class Navigator {
 	 * @return A boolean value that is false if the robot detected an obstacle and true if it was able to reach the destination point without 
 	 * detecting any obstacles.
 	 */
-	public boolean travelToWithAvoidance(double x, double y){
-		/*double currX, currY, trajTheta, distance;
-		if (thereIsObjectWithinD) //if there is an object right at the start.
-			return false;
+	public boolean [] travelToWithAvoidance(double x, double y){
+		double currX, currY, trajTheta, distance;
+		boolean[] result= new boolean[2];
+
 		// calculate the amount of theta to turn, and turn by that amount
 		currX = odo.getX();
 		currY = odo.getY();
-		trajTheta = getArcTan(x, y, currX, currY);
-		turnTo(trajTheta);
+		trajTheta = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
+		turnTo(trajTheta, true);
+		
+		if (thereIsObjectWithinD) { //if there is an object right at the start.
+			result[0] = true;
+			result[1] = true;
+			return result;
+		}
 		// calculate the distance that needs to be traveled, and go that distance
 		distance = Math.sqrt(Math.pow((y - currY), 2) + Math.pow((x - currX), 2));
 		leftMotor.setSpeed(FORWARD_SPEED);
 		rightMotor.setSpeed(FORWARD_SPEED);
-		// while the distance has not been fully reached, and while there is no object in its path
+		// while the distance has not been fully reached, go forward until object is noticed.
 		while ((Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance)) {
 				leftMotor.forward();
 				rightMotor.forward();
@@ -98,49 +105,133 @@ public class Navigator {
 					rightMotor.setSpeed(HALF_SPEED);
 					leftMotor.forward();
 					rightMotor.forward();
-					if (thereIsObjectWithinD)
-						break;
+					if (thereIsObjectWithinD){
+						leftMotor.stop(true);
+						rightMotor.stop(true);
+						result[0] = false;
+						result[1] = true;
+						return result;
+					}
 				}
 		}
 		leftMotor.stop(true);
-		rightMotor.stop(true);*/
-		
-		return true;
+		rightMotor.stop(true);
+		result[0] = false;
+		result[1] = false;
+		return result;
 	}
 	
 	/**
-	 * This method turns the robot in place to face the specified destination heading.
-	 * @param theta the destination heading value in degrees, with the positive x axis representing 0 and the positive y axis representing 90.
-	 * If theta is a negative value, the robot will turn towards it counterclockwise, and if theta is positive, the robot will turn towards it clockwise.
+	 * This method turns the robot in place to face the specified destination heading. 
+	 * @param theta heading to turn to
+	 * @param stop whether motors should stop
 	 */
-	public void turnTo(double theta) {
-		/*leftMotor.setSpeed(ROTATE_SPEED);
-		rightMotor.setSpeed(ROTATE_SPEED);
-		if (theta< 0) {
-			theta = Math.abs(theta);
-			while ((odo.getAng() < (theta - DEG_ERR))
-					|| odo.getAng() > (theta + DEG_ERR)) {
-				//turn clockwise
-				leftMotor.forward();
-				rightMotor.backward();
+	public void turnTo(double theta, boolean stop) {
+		double error = theta - odo.getAng();
+		while (Math.abs(error)> DEG_ERR){
+			error = theta - this.odo.getAng();
+			
+			if (error < -180.0) {
+				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
+			} else if (error < 0.0) {
+				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
+			} else if (error > 180.0) {
+				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
+			} else {
+				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
 			}
-		} else {
-			//turn counter clockwise
-			if (theta == 0 ||theta == 360){// handling the extremity situation 
-				// If theta =0 or 360, the error margin needs to be modified as the wrap-around will eliminate any negative theta possibilities. 
-				while (odo.getAng()<(360-2*DEG_ERR) && odo.getAng()> DEG_ERR){ 
-					leftMotor.backward();
-					rightMotor.forward();
-				}
+		}
+
+		if (stop) {
+			this.setSpeeds(0, 0);
+		}
+
+	}
+	/**
+	 * Method to allow navigator to scan left and right for an empty path.
+	 * @return boolean array of whether there was an empty path found (first value) and whether the direction found was left (second value)
+	 */
+	public boolean[] scan(){
+		//look left
+		boolean[] info = new boolean[2]; // first is whether its empty, second is direction (left is true)
+		sensorMotor.setAcceleration(2000);
+		sensorMotor.rotate(90);
+		try {Thread.sleep(200);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
+		if (thereIsObject){
+			sensorMotor.rotate(-180);
+			try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
+			if (thereIsObject){
+				info[0] = false;
+				info[1] = false;
 			}
-			else{ //normal situation
-			while (odo.getAng() < (Math.abs(theta) - DEG_ERR)
-					|| odo.getAng() > (Math.abs(theta) + DEG_ERR)) {
-				leftMotor.backward();
-				rightMotor.forward();
+			else{
+				info[0] = true;
+				info[1] = false;
 			}
-			}
-		}*/
+		}
+		else{
+			info[0] = true;
+			info[1] = true;
+		}
+		return info;
+	}
+	
+	/** 
+	 * Method to allow robot to travel forwards a set distance
+	 * @param distance amount to travel
+	 */
+	public void travelBackwards(int distance){
+		double currX, currY;
+		currX = odo.getX();
+		currY = odo.getY();
+		while(Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance){
+			leftMotor.setSpeed(HALF_SPEED);
+			rightMotor.setSpeed(HALF_SPEED);
+			leftMotor.backward();
+			rightMotor.backward();
+		}
+		leftMotor.stop(true);
+		rightMotor.stop(true);
+		
+	}
+	
+	/**
+	 * Method to allow robot to travel backwards a set distance
+	 * @param distance distance to travel
+	 */
+	public void travelForwards(int distance){
+		double currX, currY;
+		currX = odo.getX();
+		currY = odo.getY();
+		while(Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance){
+			leftMotor.setSpeed(HALF_SPEED);
+			rightMotor.setSpeed(HALF_SPEED);
+			leftMotor.forward();
+			rightMotor.forward();
+			if (thereIsObject)
+				break;
+		}
+		leftMotor.stop(true);
+		rightMotor.stop(true);
+		
+	}
+	
+	/**
+	 * Method to set the speed of the motors
+	 * @param lSpd left motor speed
+	 * @param rSpd right motor speed
+	 */
+	public void setSpeeds(float lSpd, float rSpd) {
+		this.leftMotor.setSpeed(lSpd);
+		this.rightMotor.setSpeed(rSpd);
+		if (lSpd < 0)
+			this.leftMotor.backward();
+		else
+			this.leftMotor.forward();
+		if (rSpd < 0)
+			this.rightMotor.backward();
+		else
+			this.rightMotor.forward();
 	}
 	
 	/**

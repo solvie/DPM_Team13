@@ -17,7 +17,7 @@ import lejos.robotics.geometry.Point2D;
  * 
  * This is the main robot class from which the program will be executed and all the operations will be called.
  * 
- * @version 1.0
+ * @version 1.1
  * @author Solvie Lee
  *
  */
@@ -25,6 +25,7 @@ public class Robot {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
+	private static final EV3LargeRegulatedMotor sensorMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");		
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final Port colorPort2 = LocalEV3.get().getPort("S3");
@@ -61,9 +62,10 @@ public class Robot {
 		display.setPart(0);
 		
 		odo = new Odometer(leftMotor, rightMotor);
-		navi = new Navigator(odo);
+		navi = new Navigator(odo, sensorMotor);
 		obDetector = new ObjectDetector(navi, usValue, usData, colorValue, colorData, true);
-		
+		loca = new Localizer(obDetector);
+		pathFinder = new PathFinder(obDetector);
 		obstacles = new Point2D[NUM_OBSTACLES];
 		
 		int option = 0;
@@ -104,7 +106,8 @@ public class Robot {
 	public static void localize(Point2D[] landmarks){
 		display.setPart(1);
 		//instantiate localizer
-		loca = new Localizer(obDetector);
+		// recieve input coordinates
+		
 		//convert coordinates so that they are relative to the robot's 0,0.
 		loca.convertCoordinates(landmarks);
 		//perform localization routine.

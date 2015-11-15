@@ -14,7 +14,7 @@ import lejos.robotics.SampleProvider;
  * goes past a line
  * The correction is only made if the robot is going along either the x or y axis.
  * @version 1.0
- * @author chouttle
+ * @author Vivien Traineau
  *
  */
 public class OdometerCorrection {

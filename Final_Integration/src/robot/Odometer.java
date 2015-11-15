@@ -30,17 +30,14 @@ import lejos.utility.TimerListener;
  * @author chouttle
  */
 public class Odometer implements TimerListener {
-
-	private EV3LargeRegulatedMotor leftMotor;
-	private EV3LargeRegulatedMotor rightMotor;
-
+	
+	private final int DEFAULT_TIMEOUT_PERIOD = 20, INTERVAL = 30;
+	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private Timer timer;
-	private int INTERVAL = 30;
-	private final int DEFAULT_TIMEOUT_PERIOD = 20;
-
 	private double leftRadius, rightRadius, track;
 	private double x, y, theta;
 	private double[] oldDH, dDH;
+	private String flag;
 
 	/**
 	 * Default constructor
@@ -57,7 +54,7 @@ public class Odometer implements TimerListener {
 
 		this.leftRadius = 2.07;
 		this.rightRadius = 2.07;
-		this.track = 17.1;
+		this.track = 16.5;
 
 		/*		convention used: 
 		 *	robot facing the y axis is at theta = 90; 
@@ -231,4 +228,21 @@ public class Odometer implements TimerListener {
 	public EV3LargeRegulatedMotor[] getMotors(){
 		return new EV3LargeRegulatedMotor[]{this.leftMotor, this.rightMotor};
 	}
+	
+	/**
+	 * Helper method to set flag
+	 * @param flag String to set flag to
+	 */
+	public void setFlag(String flag){
+		this.flag = flag;
+	}
+	
+	/**
+	 * Helper method for testing purposes
+	 * @return flag string
+	 */
+	public String getFlag(){
+		return flag;
+	}
+
 }

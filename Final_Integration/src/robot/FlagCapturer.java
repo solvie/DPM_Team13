@@ -28,4 +28,18 @@ public class FlagCapturer {
 		
 	}
 	
+	/**
+	 * Method to throw a block - likely will be deprecated.
+	 */
+	public void throwBlock(){
+		
+	}
+	
+	/**
+	 * Method to put a block down.
+	 */
+	public void dropBlock(){
+		
+	}
+	
 }
