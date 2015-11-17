@@ -103,7 +103,7 @@ public class PathFinder {
 						obstacles = findPathTo(x,y, obstacles);
 					}
 					
-				//	obstacles = findPathTo(x, y, obstacles);
+					obstacles = findPathTo(x, y, obstacles);
 				}
 				else{
 					navi.stopMotors();

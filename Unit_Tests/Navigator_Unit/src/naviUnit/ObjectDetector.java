@@ -46,10 +46,6 @@ public class ObjectDetector implements TimerListener{
 		updateNavi(OBJECT_FAR, OBJECT_CLOSE);
 		}
 	
-	public double filter(double distance){
-		//placeholder filtering method.
-		return distance;
-	}
 	
 	private int filter(int distance){
 		int lastdis=distance;

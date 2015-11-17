@@ -246,18 +246,6 @@ public class Navigator {
 		
 	}
 	
-	public void setSpeeds(float lSpd, float rSpd) {
-		this.leftMotor.setSpeed(lSpd);
-		this.rightMotor.setSpeed(rSpd);
-		if (lSpd < 0)
-			this.leftMotor.backward();
-		else
-			this.leftMotor.forward();
-		if (rSpd < 0)
-			this.rightMotor.backward();
-		else
-			this.rightMotor.forward();
-	}
 
 	public void setSpeeds(int lSpd, int rSpd) {
 		this.leftMotor.setSpeed(lSpd);
