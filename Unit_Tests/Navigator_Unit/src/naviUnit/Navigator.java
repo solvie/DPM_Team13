@@ -74,8 +74,8 @@ public class Navigator {
 		turnTo(trajTheta, true);
 		
 		if (thereIsObjectWithinD) { //if there is an object right at the start.
-			result[0] = true;
-			result[1] = true;
+			result[0] = true; // object at start
+			result[1] = true;// object in path.
 			return result;
 		}
 		// calculate the distance that needs to be traveled, and go that distance
@@ -112,15 +112,22 @@ public class Navigator {
 	 * Once the robot no longer sees the obstacle, it will stop.
 	 */
 	public void travelUntilNoObstacle(boolean left){ //the boolean defines the empty path direction.
+		Sound.beepSequenceUp();
 		double currTheta = odo.getAng(), destAngle;
-		sensorMotor.setAcceleration(2000);
+		sensorMotor.setAcceleration(200);
 		//turn the sensormotor and the robot to the right direction
 		if (left){
+			Sound.beep();
+			Sound.beep();
+			sensorMotor.setAcceleration(200);
 			sensorMotor.rotate(-90);
 			destAngle = (currTheta+90.0)%360;
 			turnTo(destAngle, true);
 		}
 		else{
+			Sound.beep();
+			Sound.beep();
+			sensorMotor.setAcceleration(200);
 			sensorMotor.rotate(90);
 			destAngle = (currTheta-90.0);
 			if (destAngle<0)
@@ -141,11 +148,12 @@ public class Navigator {
 				break;
 		}
 		//let the robot's body move past the obstacle before stopping.
-		try{ Thread.sleep(BUFFER_TIME*5);
+		try{ Thread.sleep(BUFFER_TIME*10);
 		} catch(InterruptedException e) {e.printStackTrace();}
 		stopMotors();	
 		
 		//put sensor back in proper locations, turn, and then 
+		currTheta = odo.getAng();
 		if (left){
 			sensorMotor.rotate(90);
 			destAngle = (currTheta-90.0);
@@ -153,6 +161,7 @@ public class Navigator {
 				destAngle = destAngle + 360;
 			turnTo(destAngle, true);
 		}
+		
 		else{
 			sensorMotor.rotate(-90);
 			destAngle = (currTheta+90.0)%360;
@@ -162,24 +171,38 @@ public class Navigator {
 		
 		//travel forward some distance
 		travelForwards(ESCAPE_DIST);
+		Sound.beep();
 	}
 	
 	/*
 	 * This method turns the robot in place to face the specified destination heading.
 	 */
 	public void turnTo(double theta, boolean stop) {
-		double error = theta - odo.getAng();
-		while (Math.abs(error)> DEG_ERR){
+		double error = theta - odo.getAng(), abserror;
+		boolean turn = false;
+		if (Math.abs(error)>DEG_ERR)
+			turn = true;
+		
+		while (turn){//changed from while Math.abs(error)> DEG_ERR
 			error = theta - this.odo.getAng();
+			abserror = Math.abs(error);
 			
 			if (error < -180.0) {
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			} else if (error < 0.0) {
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			} else if (error > 180.0) {
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			} else {
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			}
 		}
 
@@ -190,15 +213,17 @@ public class Navigator {
 	}
 	
 	public boolean[] scan(){
-		//look left
 		boolean[] info = new boolean[2]; // first is whether its empty, second is direction (left is true)
-		sensorMotor.setAcceleration(2000);
-		sensorMotor.rotate(90);
-		try {Thread.sleep(200);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
+		boolean left = false;
+		sensorMotor.setAcceleration(200);
+		sensorMotor.rotate(90); // look left
+		try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
 		if (thereIsObject){
-			sensorMotor.rotate(-180);
-			try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
+			Sound.buzz();
+			sensorMotor.rotate(-180); //look right
+			try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
 			if (thereIsObject){
+				Sound.buzz();
 				info[0] = false;
 				info[1] = false;
 			}
@@ -208,9 +233,17 @@ public class Navigator {
 			}
 		}
 		else{
+			left = true;
 			info[0] = true;
 			info[1] = true;
 		}
+		//place sensor back in starting position
+		
+		sensorMotor.setAcceleration(200);
+		if (left)
+			sensorMotor.rotate(-90);
+		else
+			sensorMotor.rotate(90);
 		return info;
 	}
 	
@@ -246,18 +279,6 @@ public class Navigator {
 		
 	}
 	
-	public void setSpeeds(float lSpd, float rSpd) {
-		this.leftMotor.setSpeed(lSpd);
-		this.rightMotor.setSpeed(rSpd);
-		if (lSpd < 0)
-			this.leftMotor.backward();
-		else
-			this.leftMotor.forward();
-		if (rSpd < 0)
-			this.rightMotor.backward();
-		else
-			this.rightMotor.forward();
-	}
 
 	public void setSpeeds(int lSpd, int rSpd) {
 		this.leftMotor.setSpeed(lSpd);
