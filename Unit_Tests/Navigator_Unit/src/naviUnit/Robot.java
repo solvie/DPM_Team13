@@ -36,7 +36,7 @@ public class Robot {
 		
 	/*	fixedUsSensor = new EV3UltrasonicSensor(fixedUsPort);
 		fixedUsValue = fixedUsSensor.getMode("Distance");
-		fixedUsData = new float[fixedUsValue.sampleSize()]; */
+		fixedUsData = new float[fixedUsValue.sampleSize()];*/
 		
 		//Set up the color sensor
 		colorSensor = new EV3ColorSensor(colorPort);
