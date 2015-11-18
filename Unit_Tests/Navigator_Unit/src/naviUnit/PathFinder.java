@@ -24,6 +24,7 @@ public class PathFinder {
 		this.navi = obDetector.getNavi();
 		this.odo = navi.getOdo();
 		this.obDetector = obDetector;
+		this.initialized = false;
 		this.flag = "";
 		this.blockedCount = 0;
 		

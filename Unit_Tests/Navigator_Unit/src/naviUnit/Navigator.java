@@ -154,7 +154,7 @@ public class Navigator {
 		stopMotors();	
 		Sound.beepSequence();
 		
-		//turn, and then 
+
 		currTheta = odo.getAng();
 		if (left){
 			destAngle = (currTheta-90.0);
@@ -168,8 +168,7 @@ public class Navigator {
 			turnTo(destAngle, true);	
 		}
 		
-		
-		//travel forward some distance
+        //Travel forwards some distance
 		setSpeeds(HALF_SPEED, HALF_SPEED);
 		leftMotor.forward();
 		rightMotor.forward();
@@ -196,6 +195,7 @@ public class Navigator {
 		else{
 			sensorMotor.rotate(-90);	
 		}
+>>>>>>> e481271e679bcb41eb5998b390d10167a47ed5c5
 		Sound.beep();
 	}
 	
