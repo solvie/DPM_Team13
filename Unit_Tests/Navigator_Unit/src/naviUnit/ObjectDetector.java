@@ -98,6 +98,7 @@ public class ObjectDetector implements TimerListener{
 			objectClose = false;
 		
 		navi.setDetectionInfo(new boolean[]{objectDetected, objectClose, false},new boolean[]{true, true, false});
+		navi.setObjectDist(distance);
 	}
 	
 	public boolean[] getVisionStatus(){

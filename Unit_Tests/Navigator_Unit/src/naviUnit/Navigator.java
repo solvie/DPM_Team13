@@ -17,6 +17,7 @@ public class Navigator {
 	private EV3LargeRegulatedMotor leftMotor, rightMotor, sensorMotor;
 	private Point2D[] knownObstacles;
 	private boolean thereIsObject, thereIsObjectWithinD, objectColorSeen;
+	private int objectDist;
 	
 	/*
 	 * Default constructor
@@ -29,6 +30,7 @@ public class Navigator {
 		this.thereIsObject = false;
 		this.thereIsObjectWithinD = false;
 		this.objectColorSeen = false;
+		this.objectDist = 255;
 	}
 	
 	
@@ -72,6 +74,11 @@ public class Navigator {
 		currY = odo.getY();
 		trajTheta = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
 		turnTo(trajTheta, true);
+		
+		if(thereIsObject){
+			//to handle the angled object case.
+			distance = objectDist;
+		}
 		
 		if (thereIsObjectWithinD) { //if there is an object right at the start.
 			result[0] = true; // object at start
@@ -154,7 +161,7 @@ public class Navigator {
 		stopMotors();	
 		Sound.beepSequence();
 		
-
+		//turn, and then 
 		currTheta = odo.getAng();
 		if (left){
 			destAngle = (currTheta-90.0);
@@ -162,13 +169,13 @@ public class Navigator {
 				destAngle = destAngle + 360;
 			turnTo(destAngle, true);
 		}
-		
 		else{
 			destAngle = (currTheta+90.0)%360;
 			turnTo(destAngle, true);	
 		}
 		
-        //Travel forwards some distance
+		
+		//travel forward some distance
 		setSpeeds(HALF_SPEED, HALF_SPEED);
 		leftMotor.forward();
 		rightMotor.forward();
@@ -195,7 +202,6 @@ public class Navigator {
 		else{
 			sensorMotor.rotate(-90);	
 		}
->>>>>>> e481271e679bcb41eb5998b390d10167a47ed5c5
 		Sound.beep();
 	}
 	
@@ -338,6 +344,10 @@ public class Navigator {
 			this.thereIsObjectWithinD = info[1];
 		if (update[2])
 			this.objectColorSeen = info[2];
+	}
+	
+	public void setObjectDist(int dist){
+		this.objectDist = dist;
 	}
 	
 	/*
