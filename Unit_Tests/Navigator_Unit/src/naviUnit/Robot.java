@@ -75,7 +75,9 @@ public class Robot {
 		PathFinder pathFinder = new PathFinder(obDetector);
 		Point2D[] obstacles = new Point2D[NUM_OBSTACLES];
 		obDetector.start();
-		pathFinder.findPathTo(90,90, obstacles);
+		
+		
+		pathFinder.findPathTo(60,60, obstacles);
 	
 		int option = 0;
 		while (option == 0)

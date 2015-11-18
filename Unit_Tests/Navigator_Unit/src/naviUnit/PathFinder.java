@@ -10,6 +10,8 @@ import lejos.robotics.geometry.Point2D;
 public class PathFinder {
 
 	private static final double DEG_ERR = 0.5, BACK_DIST = 15;
+	private int blockedCount;
+	private boolean initialized;
 	private Navigator navi;
 	private Odometer odo;
 	private ObjectDetector obDetector;
@@ -23,9 +25,13 @@ public class PathFinder {
 		this.navi = obDetector.getNavi();
 		this.odo = navi.getOdo();
 		this.obDetector = obDetector;
+		this.initialized = false;
 		this.flag = "";
+		this.blockedCount = 0;
 		
 	}
+	
+	
 
 	/*
 	 * This method will make the robot go from its current point to the destination point travelling entirely along lines 
@@ -46,13 +52,13 @@ public class PathFinder {
 		if (horizl-vertl>0){
 			wayPoints[0] = new Point2D.Double(x, currY);
 			wayPoints[1] = new Point2D.Double(x, y);
-		
+	
 		}
 		else{
 			wayPoints[0] = new Point2D.Double(currX, y);
-			wayPoints[1] = new Point2D.Double(x, y);
-		
+			wayPoints[1] = new Point2D.Double(x, y);	
 		}
+		
 		
 		//TODO: modify travel to method so that if the destination it wants to travel to is within a centimeter of the current angle and whatever
 		//you stay put.
@@ -62,16 +68,38 @@ public class PathFinder {
 			//travel to the first point. If we try to travel there and don't reach the correct place, the same method is called again. 
 			setOdoFlag(0);
 			pathBlocked1 = navi.travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
-			if (pathBlocked1[0]){ // if there is an obstacle immediately in front, flip the waypoints
-				if (wayPoints[0].getX() ==x && wayPoints[0].getY()==currY)
-					wayPoints[0] = new Point2D.Double(currX, y);
-				else
-					wayPoints[0] = new Point2D.Double(x, currY);
+			while (pathBlocked1[0]){
+				 // if there is an obstacle immediately in front, flip the waypoints
+					blockedCount ++;
+					if (wayPoints[0].getX() ==x && wayPoints[0].getY()==currY)
+						wayPoints[0] = new Point2D.Double(currX, y);
+					else
+						wayPoints[0] = new Point2D.Double(x, currY);
+				pathBlocked1 = navi.travelToWithAvoidance(wayPoints[0].getX(), wayPoints[0].getY());
+				if (blockedCount>1)
+					break;
 			}
 			
 			if (pathBlocked1[1]){
-				Sound.beep();
+				Sound.beepSequence();
 				setOdoFlag(1);
+				if (blockedCount>1){
+					//reset blockedCount.
+					blockedCount = 0;
+					Sound.beepSequence();
+					boolean emptyFound[] = new boolean[2];
+					emptyFound = navi.scan();
+					
+					if (emptyFound[0]){
+						this.escapeCorner(emptyFound[1]);
+						obstacles = findPathTo(x, y, obstacles);
+					}
+					else{
+						this.backOutOfCorner();
+						obstacles = findPathTo(x,y, obstacles);
+					}
+					//TODO: Check which direction it is facing when it gets to this point. 
+				}
 				obstacles = findPathTo(x, y, obstacles);
 				
 			}
@@ -80,38 +108,48 @@ public class PathFinder {
 				pathBlocked2 =navi.travelToWithAvoidance(wayPoints[1].getX(), wayPoints[1].getY());
 				
 				if (pathBlocked2[1]){ //hard case! 
-					Sound.beepSequenceUp();
 					boolean emptyFound[] = new boolean[2];
 					emptyFound = navi.scan();
 					
 					if (emptyFound[0]){ //TODO: make sure to never try to retrace your steps and get caught in an infinite loop
 						//escape
-						Sound.beepSequence();
-						navi.travelUntilNoObstacle(emptyFound[1]);
+						this.escapeCorner(emptyFound[1]);
 						obstacles = findPathTo(x, y, obstacles);
 					}
 					else{
 						//back up out of corner, then escape.
-						Sound.beepSequence();
-						navi.travelBackwards((int) BACK_DIST);
-						emptyFound = navi.scan();
-						while(!emptyFound[0]){
-							navi.travelBackwards((int)BACK_DIST);
-							emptyFound = navi.scan();
-						}
-						navi.travelUntilNoObstacle(emptyFound[1]);
+						this.backOutOfCorner();
 						obstacles = findPathTo(x,y, obstacles);
 					}
-					
 					obstacles = findPathTo(x, y, obstacles);
 				}
 				else{
 					navi.stopMotors();
+					blockedCount = 0;
+					initialized = false;
 					return obstacles;
 				}
 			}	
 		}
+		blockedCount = 0;
+		initialized = false;
 		return obstacles;
+	}
+	
+	private void escapeCorner(boolean direction){
+		navi.travelUntilNoObstacle(direction); //scan returns emptyFound[1] == true if empty path is left
+	}
+	
+	private void backOutOfCorner(){
+		//Sound.beepSequence();
+		boolean[] emptyFound = new boolean[2];
+		navi.travelBackwards((int) BACK_DIST);
+		emptyFound = navi.scan();
+		while(!emptyFound[0]){
+			navi.travelBackwards((int)BACK_DIST);
+			emptyFound = navi.scan();
+		}
+		navi.travelUntilNoObstacle(emptyFound[1]); //
 	}
 	
 	private void setOdoFlag(int i){
