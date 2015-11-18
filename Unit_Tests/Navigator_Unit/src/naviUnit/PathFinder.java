@@ -11,7 +11,6 @@ public class PathFinder {
 
 	private static final double DEG_ERR = 0.5, BACK_DIST = 15;
 	private int blockedCount;
-	private boolean initialized;
 	private Navigator navi;
 	private Odometer odo;
 	private ObjectDetector obDetector;
@@ -126,13 +125,11 @@ public class PathFinder {
 				else{
 					navi.stopMotors();
 					blockedCount = 0;
-					initialized = false;
 					return obstacles;
 				}
 			}	
 		}
 		blockedCount = 0;
-		initialized = false;
 		return obstacles;
 	}
 	
