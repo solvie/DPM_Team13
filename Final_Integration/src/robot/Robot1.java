@@ -17,18 +17,18 @@ import lejos.robotics.geometry.Point2D;
  * 
  * This is the main robot class from which the program will be executed and all the operations will be called.
  * 
- * @version 1.1
+ * @version 2.0
  * @author Solvie Lee
  *
  */
-public class Robot {
+public class Robot1 {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
-	private static final EV3LargeRegulatedMotor sensorMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
+	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
+	private static final EV3LargeRegulatedMotor sensorMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");		
-	private static final Port colorPort = LocalEV3.get().getPort("S2");
-	private static final Port colorPort2 = LocalEV3.get().getPort("S3");
+	private static final Port colorPort = LocalEV3.get().getPort("S2"); //front color sensor
+	private static final Port colorPort2 = LocalEV3.get().getPort("S3"); //bottom color sensor
 	private static Display display;
 	private static Navigator navi;
 	private static Odometer odo;
@@ -53,9 +53,9 @@ public class Robot {
 		float[] colorData = new float[colorValue.sampleSize()];
 		
 		//Set up light sensor for odo
-		SensorModes colorSensor2 = new EV3ColorSensor(colorPort);
-		SampleProvider colorValue2 = colorSensor.getMode("Red");//TODO: change mode?
-		float[] colorData2 = new float[colorValue.sampleSize()];
+		SensorModes colorSensor2 = new EV3ColorSensor(colorPort2);
+		SampleProvider colorValue2 = colorSensor2.getMode("ColorID");//TODO: change mode?
+		float[] colorData2 = new float[colorValue2.sampleSize()];
 	
 		//Set up display
 		display = new Display();
@@ -63,7 +63,7 @@ public class Robot {
 		
 		odo = new Odometer(leftMotor, rightMotor);
 		navi = new Navigator(odo, sensorMotor);
-		obDetector = new ObjectDetector(navi, usValue, usData, colorValue, colorData, true);
+		obDetector = new ObjectDetector(navi, usValue, usData, colorValue, colorData, colorValue2, colorData2, true);
 		loca = new Localizer(obDetector);
 		pathFinder = new PathFinder(obDetector);
 		obstacles = new Point2D[NUM_OBSTACLES];
@@ -88,15 +88,15 @@ public class Robot {
 	 * it will perform the localization and block finding routines in sequence.
 	 */
 	public static void execute(){
-		landmarks = null; //SET enemy base, home base, starting position, etc.
+		landmarks = new Point2D[3]; //SET enemy base index 0, home base 1, starting position 2
 		//(package for Wifi communications not available yet on mycourses.) 
 		
 		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
 		localize(landmarks);
-		findEnemyBase();
-		findFlag();
-		captureFlag();
-		returnHomeBase();
+		//findEnemyBase();
+		//findFlag();
+		//captureFlag();
+		//returnHomeBase();
 		//execute the rest of the program.
 	}
 	
@@ -109,9 +109,9 @@ public class Robot {
 		// recieve input coordinates
 		
 		//convert coordinates so that they are relative to the robot's 0,0.
-		loca.convertCoordinates(landmarks);
+		//loca.convertCoordinates(landmarks);
 		//perform localization routine.
-		loca.localize();
+		loca.doLocalization();
 		
 	}
 	/**
@@ -119,7 +119,7 @@ public class Robot {
 	 */
 	public static void findEnemyBase(){
 		display.setPart(2);
-		double x=0, y=0;
+		double x=60, y=60; //Hardcoded to 60,60 for now
 		//TODO set x and y to the coordinates of the enemy base 
 		
 		// instantiate pathfinder and empty obstacles array

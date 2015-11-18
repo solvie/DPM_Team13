@@ -26,8 +26,7 @@ import lejos.utility.TimerListener;
  *  File: Odometer.java
  *  
  * @version 1.1
- * @author Sean Lawlor 
- * @author chouttle
+ * @author Sean Lawlor, Vivien Traineau
  */
 public class Odometer implements TimerListener {
 	
@@ -52,8 +51,8 @@ public class Odometer implements TimerListener {
 
 		// default values, modify for your robot
 
-		this.leftRadius = 2.07;
-		this.rightRadius = 2.07;
+		this.leftRadius = 2.1;
+		this.rightRadius = 2.1;
 		this.track = 16.5;
 
 		/*		convention used: 
@@ -68,13 +67,14 @@ public class Odometer implements TimerListener {
 		this.oldDH = new double[2];
 		this.dDH = new double[2];
 
+		/*
 		//creation of the correction, might need to run on a different thread???
 		final OdometerCorrection correctionOdo = new OdometerCorrection(this);
 		(new Thread(){
 			public void run(){
 				correctionOdo.run();
 			}
-		}).start();
+		}).start(); */
 
 		//start the timer
 		this.timer = new Timer((INTERVAL <= 0) ? INTERVAL : DEFAULT_TIMEOUT_PERIOD, this);

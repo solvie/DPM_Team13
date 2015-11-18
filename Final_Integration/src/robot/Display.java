@@ -81,6 +81,7 @@ public class Display implements TimerListener {
 	 */
 	public void displayLocalization(){ //Displays information
 		//TODO
+		LCD.drawString("Localizing", 0, 0);
 		
 	}
 	

@@ -21,13 +21,11 @@ public class ObjectDetector implements TimerListener {
 	public static final int errorMargin = 2, DEFAULT_INTERVAL = 25, offFactor = 20;
 	private static final int OBJECT_CLOSE = 7, OBJECT_FAR = 15, MAX_RANGE = 120;
 	private boolean objectDetected, objectClose, objectColorSeen, flagDetected;
-	private int i =0;
-	private SampleProvider usValue, colorValue;
-	private int color, blockDetected, distance, filter, filter_out = 10;
-	private float[] usData, colorData;
+	private SampleProvider usValue, colorSensor, colorSensor2;
+	private int  distance, realdistance, lastcolor2, deltacolor2, filter, filter_out = 10;
+	private float[] usData, colorData, colorData2;
 	private Timer timer;
 	private Navigator navi;
-	private Odometer odo;
 	private ArrayList<Integer> Data = new ArrayList<Integer>();
 	
 	/**
@@ -40,16 +38,16 @@ public class ObjectDetector implements TimerListener {
 	 * @param autostart whether the timer should autostart
 	 */
 	public ObjectDetector(Navigator navi, SampleProvider usValue, float[] usData,
-			SampleProvider colorValue, float[] colorData, boolean autostart){
+			SampleProvider colorSensor, float[] colorData, SampleProvider colorSensor2, float[] colorData2, boolean autostart){
 		this.objectDetected = false;
-		this.blockDetected = -1;
-		this.distance = MAX_RANGE; // initialize distance to farthest.
 		this.usValue = usValue;
-		this.colorValue = colorValue;
 		this.usData = usData;
+		this.colorSensor = colorSensor;
 		this.colorData = colorData;
+		this.colorSensor2 = colorSensor2;
+		this.colorData2 = colorData2;
+		this.realdistance = getdistance();
 		this.navi = navi;
-		this.odo = null;
 		this.timer = new Timer(DEFAULT_INTERVAL, this);
 		if (autostart)
 			timer.start();
@@ -59,44 +57,42 @@ public class ObjectDetector implements TimerListener {
 	/**
 	 * This method checks the sensor data whenever it is called, and puts it through the filter.  It also tells the navigator whether an object/flag was seen or not. 
 	 */
+	@Override
 	public void timedOut(){
-		synchronized(this){
-		distance = filter(distance);
+		int lastrealdis = realdistance;
+		Data.clear();
+		for(int i =0; i<46; i++){
+			Data.add(this.getdistance());
+			Delay.usDelay(500);
 		}
-		//Tell the navi the information.
+		Collections.sort(Data);
+		int currentrealdis = Data.get(Data.size()/2);
+		synchronized(this){
+			int diff = Math.abs(currentrealdis - lastrealdis);
+			if (diff>20 && filter<filter_out){
+				filter++;
+			}else{
+				realdistance = currentrealdis;
+				filter = 0;
+			}
+			deltacolor2 = this.getcolor2() - lastcolor2;
+			lastcolor2 = this.getcolor2();
+			
+			//distance = filter(distance);
+		
+		}
+			//Tell the navi the information.
 		updateNavi(OBJECT_FAR, OBJECT_CLOSE);
 		
 	}
 	
-	/**
-	 * This method filters the values from the sensor
-	 * @param distance
-	 * @return distance value
-	 */
-	private int filter(int distance){
-		int lastdis=distance;
-				Data.clear();
-				for(int i=0;i<46;i++){
-					Data.add(this.getrawdistance());
-					Delay.usDelay(500);
-				}
-				Collections.sort(Data);
-				int currentdis=Data.get(Data.size()/2);
-				int diff=Math.abs(currentdis-lastdis);
-				if(diff>20 && filter<filter_out){
-					filter++;
-				}else{
-					distance=currentdis;
-					filter=0;
-				}
-				return distance;
-	}
+	
 	
 	/**
-	 * This is a helper method for the filter method
+	 * 
 	 * @return raw data
 	 */
-	public int getrawdistance(){
+	public int getdistance(){
 		synchronized (this){
 						usValue.fetchSample(usData, 0);
 						int rawdistance = (int)(usData[0]*100.0);
@@ -116,12 +112,12 @@ public class ObjectDetector implements TimerListener {
 	 */
 	public void updateNavi(double farDist, double closeDist){
 		//notify navi if object 
-		if (distance <= farDist)
+		if (realdistance <= farDist)
 			objectDetected = true;
 		else
 			objectDetected = false;
 		//notify navi if object is within closeDist away
-		if(distance<= closeDist)
+		if(realdistance<= closeDist)
 			objectClose = true;
 		else
 			objectClose = false;
@@ -140,6 +136,48 @@ public class ObjectDetector implements TimerListener {
 		status[2] = objectColorSeen;
 		status[3] = flagDetected;
 		return status;
+	}
+	
+	/**
+	 * Color sensor in the front
+	 * @return
+	 */
+	public int getcolor1(){
+		synchronized (this){
+			colorSensor.fetchSample(colorData, 0);
+			int color=(int)(colorData[0]*100);	
+			return color;
+		}
+	}
+	
+	/**
+	 * Color sensor in the back
+	 * @return
+	 */
+	public int getcolor2(){
+		synchronized (this){
+			colorSensor2.fetchSample(colorData2, 0);
+			int color=(int)(colorData2[0]);	
+			return color;
+		}
+	}
+	
+	/**
+	 * Get filtered distance value
+	 * @return
+	 */
+	public int getrealdis(){
+		synchronized (this){
+			return realdistance;}
+	}
+	
+	/**
+	 * Get delta value of second color sensor
+	 * @return
+	 */
+	public int getdeltacolor2(){
+		synchronized (this){
+			return deltacolor2;}
 	}
 	
 	/**

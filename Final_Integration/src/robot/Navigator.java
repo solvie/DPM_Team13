@@ -1,5 +1,6 @@
 package robot;
 
+import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.geometry.Point2D;
 
@@ -14,14 +15,15 @@ import lejos.robotics.geometry.Point2D;
  * Therefore, it does not  actually use ultrasonic data (that will be a different test) to detect blocks, but will be given new block
  * information at various intervals, from an outside class. 
  * 
+ * @version 2.0
  * @author Solvie Lee
- * @version 1.1
  * 
  */
 
 public class Navigator {
-	private static final int SLOWER_ROTATE = 30;
-	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, DEG_ERR = 2, D = 15;
+	private static final int SLOWER_ROTATE = 30, ESCAPE_DIST = 30;
+	private static final long BUFFER_TIME = 500;
+	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, DEG_ERR = 5, D = 15;
 	private Odometer odo;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor, sensorMotor;
 	private Point2D[] knownObstacles;
@@ -122,45 +124,132 @@ public class Navigator {
 	}
 	
 	/**
+	 * Travels to the destination point in a similar manner as the travelTo method, However
+	 * it will slow down when it sees an obstacle,
+	 * and stop when it is a certain distance away from it.
+	 * @param left whether the robot turned left to avoid the obstacle
+	 */
+	public void travelUntilNoObstacle(boolean left){ //the boolean defines the empty path direction.
+		Sound.beepSequenceUp();
+		double currTheta = odo.getAng(), destAngle;
+		sensorMotor.setAcceleration(200);
+		//turn the sensormotor and the robot to the right direction
+		if (left){
+			Sound.beep();
+			Sound.beep();
+			sensorMotor.setAcceleration(200);
+			sensorMotor.rotate(-90);
+			destAngle = (currTheta+90.0)%360;
+			turnTo(destAngle, true);
+		}
+		else{
+			Sound.beep();
+			Sound.beep();
+			sensorMotor.setAcceleration(200);
+			sensorMotor.rotate(90);
+			destAngle = (currTheta-90.0);
+			if (destAngle<0)
+				destAngle = destAngle + 360;
+			turnTo(destAngle, true);	
+		}
+		
+		//go forward until there is no obstacle detected.
+		setSpeeds(HALF_SPEED, HALF_SPEED);
+		leftMotor.forward();
+		rightMotor.forward();
+		try {Thread.sleep(BUFFER_TIME);
+		} catch (InterruptedException e) {e.printStackTrace();}
+		while (true){
+			leftMotor.forward();
+			rightMotor.forward();
+			if (!thereIsObject)
+				break;
+		}
+		//let the robot's body move past the obstacle before stopping.
+		try{ Thread.sleep(BUFFER_TIME*10);
+		} catch(InterruptedException e) {e.printStackTrace();}
+		stopMotors();	
+		
+		//turn, and then 
+		currTheta = odo.getAng();
+		if (left){
+			if (destAngle<0)
+				destAngle = destAngle + 360;
+			turnTo(destAngle, true);
+		}
+		
+		else{
+			destAngle = (currTheta+90.0)%360;
+			turnTo(destAngle, true);	
+		}
+		
+		//travel forward some distance
+		travelForwards2(ESCAPE_DIST);
+		
+		// put sensors back
+		if (left){
+			sensorMotor.rotate(90);
+		}
+		else{
+			sensorMotor.rotate(-90);	
+		}
+		Sound.beep();
+	}
+	
+	/**
 	 * This method turns the robot in place to face the specified destination heading. 
 	 * @param theta heading to turn to
 	 * @param stop whether motors should stop
 	 */
 	public void turnTo(double theta, boolean stop) {
-		double error = theta - odo.getAng();
-		while (Math.abs(error)> DEG_ERR){
+		double error = theta - odo.getAng(), abserror;
+		boolean turn = false;
+		if (Math.abs(error)>DEG_ERR)
+			turn = true;
+		
+		while (turn){//changed from while Math.abs(error)> DEG_ERR
 			error = theta - this.odo.getAng();
+			abserror = Math.abs(error);
 			
 			if (error < -180.0) {
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			} else if (error < 0.0) {
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			} else if (error > 180.0) {
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			} else {
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			}
 		}
 
 		if (stop) {
 			this.setSpeeds(0, 0);
 		}
-
 	}
 	/**
 	 * Method to allow navigator to scan left and right for an empty path.
 	 * @return boolean array of whether there was an empty path found (first value) and whether the direction found was left (second value)
 	 */
 	public boolean[] scan(){
-		//look left
 		boolean[] info = new boolean[2]; // first is whether its empty, second is direction (left is true)
-		sensorMotor.setAcceleration(2000);
-		sensorMotor.rotate(90);
-		try {Thread.sleep(200);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
+		boolean left = false;
+		sensorMotor.setAcceleration(200);
+		sensorMotor.rotate(90); // look left
+		try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
 		if (thereIsObject){
-			sensorMotor.rotate(-180);
-			try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
+			Sound.buzz();
+			sensorMotor.rotate(-180); //look right
+			try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
 			if (thereIsObject){
+				Sound.buzz();
 				info[0] = false;
 				info[1] = false;
 			}
@@ -170,14 +259,22 @@ public class Navigator {
 			}
 		}
 		else{
+			left = true;
 			info[0] = true;
 			info[1] = true;
 		}
+		//place sensor back in starting position
+		
+		sensorMotor.setAcceleration(200);
+		if (left)
+			sensorMotor.rotate(-90);
+		else
+			sensorMotor.rotate(90);
 		return info;
 	}
 	
 	/** 
-	 * Method to allow robot to travel forwards a set distance
+	 * Method to allow robot to travel backwards a set distance
 	 * @param distance amount to travel
 	 */
 	public void travelBackwards(int distance){
@@ -196,7 +293,7 @@ public class Navigator {
 	}
 	
 	/**
-	 * Method to allow robot to travel backwards a set distance
+	 * Method to allow robot to travel forwards a set distance
 	 * @param distance distance to travel
 	 */
 	public void travelForwards(int distance){
@@ -214,6 +311,32 @@ public class Navigator {
 		leftMotor.stop(true);
 		rightMotor.stop(true);
 		
+	}
+	
+	/**
+	 * A method to travel forward by at least a certain distance, but more if there is an object next to it
+	 * @param escapeDist minimum distance to go.
+	 */
+	public void travelForwards2(int escapeDist){
+		double currX, currY;
+		currX = odo.getX();
+		currY = odo.getY();
+		
+		setSpeeds(HALF_SPEED, HALF_SPEED);
+		leftMotor.forward();
+		rightMotor.forward();
+		try {Thread.sleep(BUFFER_TIME);
+		} catch (InterruptedException e) {e.printStackTrace();}
+		while (Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < escapeDist){
+			leftMotor.forward();
+			rightMotor.forward();
+			if (!thereIsObject)
+				break;
+		}
+		//let the robot's body move past the obstacle before stopping.
+		try{ Thread.sleep(BUFFER_TIME*10);
+		} catch(InterruptedException e) {e.printStackTrace();}
+		stopMotors();	
 	}
 	
 	/**
