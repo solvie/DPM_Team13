@@ -147,15 +147,16 @@ public class Navigator {
 			if (!thereIsObject)
 				break;
 		}
+		Sound.beepSequenceUp();
 		//let the robot's body move past the obstacle before stopping.
 		try{ Thread.sleep(BUFFER_TIME*10);
 		} catch(InterruptedException e) {e.printStackTrace();}
 		stopMotors();	
+		Sound.beepSequence();
 		
-		//put sensor back in proper locations, turn, and then 
+		//turn, and then 
 		currTheta = odo.getAng();
 		if (left){
-			sensorMotor.rotate(90);
 			destAngle = (currTheta-90.0);
 			if (destAngle<0)
 				destAngle = destAngle + 360;
@@ -163,14 +164,38 @@ public class Navigator {
 		}
 		
 		else{
-			sensorMotor.rotate(-90);
 			destAngle = (currTheta+90.0)%360;
-			turnTo(destAngle, true);
-			
+			turnTo(destAngle, true);	
 		}
 		
+		
 		//travel forward some distance
-		travelForwards(ESCAPE_DIST);
+		setSpeeds(HALF_SPEED, HALF_SPEED);
+		leftMotor.forward();
+		rightMotor.forward();
+		try {Thread.sleep(BUFFER_TIME*6);
+		} catch (InterruptedException e) {e.printStackTrace();}
+		while (true){
+			leftMotor.forward();
+			rightMotor.forward();
+			if (!thereIsObject)
+				break;
+		}
+		Sound.beepSequenceUp();
+		//let the robot's body move past the obstacle before stopping.
+		try{ Thread.sleep(BUFFER_TIME*10);
+		} catch(InterruptedException e) {e.printStackTrace();}
+		stopMotors();	
+		Sound.beepSequence();
+		
+		
+		// put sensors back
+		if (left){
+			sensorMotor.rotate(90);
+		}
+		else{
+			sensorMotor.rotate(-90);	
+		}
 		Sound.beep();
 	}
 	
@@ -261,6 +286,7 @@ public class Navigator {
 		rightMotor.stop(true);
 		
 	}
+	
 	
 	public void travelForwards(int distance){
 		double currX, currY;

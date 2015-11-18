@@ -11,7 +11,7 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 import lejos.robotics.geometry.Point2D;
 
-public class Robot {
+public class Robot1_pf1 {
 
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
@@ -36,7 +36,7 @@ public class Robot {
 		
 	/*	fixedUsSensor = new EV3UltrasonicSensor(fixedUsPort);
 		fixedUsValue = fixedUsSensor.getMode("Distance");
-		fixedUsData = new float[fixedUsValue.sampleSize()];*/
+		fixedUsData = new float[fixedUsValue.sampleSize()]; */
 		
 		//Set up the color sensor
 		colorSensor = new EV3ColorSensor(colorPort);
