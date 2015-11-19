@@ -209,13 +209,13 @@ public class Navigator {
 	 * This method turns the robot in place to face the specified destination heading.
 	 */
 	public void turnTo(double theta, boolean stop) {
-		double error = theta - odo.getAng(), abserror;
+		double error = normalize(theta) - odo.getAng(), abserror;
 		boolean turn = false;
 		if (Math.abs(error)>DEG_ERR)
 			turn = true;
 		
 		while (turn){//changed from while Math.abs(error)> DEG_ERR
-			error = theta - this.odo.getAng();
+			error = normalize(theta) - this.odo.getAng();
 			abserror = Math.abs(error);
 			
 			if (error < -180.0) {
@@ -241,6 +241,13 @@ public class Navigator {
 			this.setSpeeds(0, 0);
 		}
 
+	}
+	
+	public double normalize(double deg){
+		double normal = deg%360;
+		if(normal<0)
+			normal+=360;
+		return normal;
 	}
 	
 	public boolean[] scan(){
