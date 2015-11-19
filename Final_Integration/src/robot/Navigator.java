@@ -23,7 +23,8 @@ import lejos.robotics.geometry.Point2D;
 public class Navigator {
 	private static final int SLOWER_ROTATE = 30, ESCAPE_DIST = 30;
 	private static final long BUFFER_TIME = 500;
-	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, DEG_ERR = 5, D = 15;
+	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, D = 15;
+	private static final double DEG_ERR = 0.5;
 	private Odometer odo;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor, sensorMotor;
 	private Point2D[] knownObstacles;
@@ -55,7 +56,7 @@ public class Navigator {
 		// calculate the amount of theta to turn, and turn by that amount
 		currX = odo.getX();
 		currY = odo.getY();
-		trajTheta = getArcTan(x, y, currX, currY);
+		trajTheta = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
 		
 		turnTo(trajTheta, true);
 		// calculate the distance that needs to be traveled, and go that distance
@@ -201,38 +202,28 @@ public class Navigator {
 	 * @param theta heading to turn to
 	 * @param stop whether motors should stop
 	 */
-	public void turnTo(double theta, boolean stop) {
-		double error = theta - odo.getAng(), abserror;
-		boolean turn = false;
-		if (Math.abs(error)>DEG_ERR)
-			turn = true;
-		
-		while (turn){//changed from while Math.abs(error)> DEG_ERR
-			error = theta - this.odo.getAng();
-			abserror = Math.abs(error);
-			
-			if (error < -180.0) {
+	public void turnTo(double angle, boolean stop) {
+		double error = normalize(angle) - this.odo.getAng();
+		while(Math.abs(error)>DEG_ERR){
+			error = normalize(angle)-this.odo.getAng();
+			if (error<-180.0){
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
-				if (abserror < DEG_ERR)
-					break;
-			} else if (error < 0.0) {
+			} else if (error <0.0){
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
-				if (abserror < DEG_ERR)
-					break;
-			} else if (error > 180.0) {
+			} else if (error>180.0){
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
-				if (abserror < DEG_ERR)
-					break;
 			} else {
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
-				if (abserror < DEG_ERR)
-					break;
 			}
+			
 		}
-
-		if (stop) {
-			this.setSpeeds(0, 0);
-		}
+	}
+	
+	public double normalize(double deg){
+		double normal = deg%360;
+		if(normal<0)
+			normal+=360;
+		return normal;
 	}
 	/**
 	 * Method to allow navigator to scan left and right for an empty path.

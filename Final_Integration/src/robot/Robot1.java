@@ -112,7 +112,7 @@ public class Robot1 {
 		//loca.convertCoordinates(landmarks);
 		//perform localization routine.
 		loca.doLocalization();
-		
+		return;
 	}
 	/**
 	 * This method uses the navigator to go to the enemy base while avoiding obstacles along the way

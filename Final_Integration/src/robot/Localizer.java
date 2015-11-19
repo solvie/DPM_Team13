@@ -22,6 +22,7 @@ public class Localizer {
 	private ObjectDetector detector;
 	private Odometer odo;
 	private Navigator navigate;
+	private boolean finished;
 	private ArrayList<Double> Th = new ArrayList<Double>();
 	
 	/**
@@ -32,6 +33,7 @@ public class Localizer {
 		this.detector = obDetector;
 		this.navigate = obDetector.getNavi();
 		this.odo = navigate.getOdo();
+		this.finished = false;
 	}
 	
 	
@@ -40,6 +42,7 @@ public class Localizer {
 	 * (based on the new coordinate system as defined in the previous method)
 	 */
 	public void doLocalization(){
+		finished = false;
 		double angleA, angleB, deltaT;
 		angleA=0;
 		angleB=0;
@@ -101,11 +104,15 @@ public class Localizer {
 		double x=(0-SENSORDIS)*Math.cos(Math.toRadians(thetaY)/2);
 		double y=(0-SENSORDIS)*Math.cos(Math.toRadians(thetaX)/2);
 		double delta=Th.get(0)+thetaY/2;
-		odo.setPosition(new double [] {x, y, odo.getAng()-delta+7.8}, new boolean [] {true,true,true});
+		odo.setPosition(new double [] {x, y, odo.getAng()-delta}, new boolean [] {true,true,true});
 		// when done travel to (0,0) and turn to 0 degrees
 		navigate.travelTo(0.0, 0.0);
 		navigate.turnTo(0, true);
+		finished = true;
 	}
 	
+	public boolean isFinished(){
+		return finished;
+	}
 	
 }
