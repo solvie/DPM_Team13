@@ -21,14 +21,13 @@ import lejos.robotics.geometry.Point2D;
  */
 
 public class Navigator {
-	private static final int SLOWER_ROTATE = 30, ESCAPE_DIST = 30;
-	private static final long BUFFER_TIME = 500;
-	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, D = 15;
-	private static final double DEG_ERR = 0.5;
+	private static final int SLOWER_ROTATE = 30, BUFFER_TIME = 500, ESCAPE_DIST = 30;
+	public static int DEFAULT_TIMEOUT_PERIOD = 20, FORWARD_SPEED = 200, HALF_SPEED = 100, ROTATE_SPEED = 50, DEG_ERR = 2, D = 15;
 	private Odometer odo;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor, sensorMotor;
 	private Point2D[] knownObstacles;
-	private boolean thereIsObject, thereIsObjectWithinD, objectColorSeen;
+	private boolean thereIsObject, thereIsObjectCloseish, thereIsObjectWithinD, objectColorSeen;
+	private int objectDist;
 	
 	/**
 	 * Default constructor
@@ -40,8 +39,10 @@ public class Navigator {
 		this.rightMotor = odo.getMotors()[1];
 		this.sensorMotor = sensorMotor;
 		this.thereIsObject = false;
+		this.thereIsObjectCloseish= false;
 		this.thereIsObjectWithinD = false;
 		this.objectColorSeen = false;
+		this.objectDist = 255;
 	}
 	
 	
@@ -91,8 +92,8 @@ public class Navigator {
 		turnTo(trajTheta, true);
 		
 		if (thereIsObjectWithinD) { //if there is an object right at the start.
-			result[0] = true;
-			result[1] = true;
+			result[0] = true; // object at start
+			result[1] = true;// object in path.
 			return result;
 		}
 		// calculate the distance that needs to be traveled, and go that distance
@@ -100,10 +101,18 @@ public class Navigator {
 		leftMotor.setSpeed(FORWARD_SPEED);
 		rightMotor.setSpeed(FORWARD_SPEED);
 		// while the distance has not been fully reached, go forward until object is noticed.
+		boolean latch = true;
 		while ((Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance)) {
 				leftMotor.forward();
 				rightMotor.forward();
-				if (thereIsObject){
+				if(thereIsObject&& latch){
+					//to handle the angled object case.
+					distance = objectDist-2.5;
+					Sound.beep();
+					Sound.beep();
+					latch=false;
+				}
+				if (thereIsObjectCloseish){
 					leftMotor.setSpeed(HALF_SPEED);
 					rightMotor.setSpeed(HALF_SPEED);
 					leftMotor.forward();
@@ -119,6 +128,11 @@ public class Navigator {
 		}
 		leftMotor.stop(true);
 		rightMotor.stop(true);
+		if (latch==false){
+			result[0] = false;
+			result[1] = true;
+			return result;
+		}
 		result[0] = false;
 		result[1] = false;
 		return result;
@@ -138,6 +152,7 @@ public class Navigator {
 		if (left){
 			Sound.beep();
 			Sound.beep();
+			sensorMotor.setAcceleration(200);
 			sensorMotor.rotate(-90);
 			destAngle = (currTheta+90.0)%360;
 			turnTo(destAngle, true);
@@ -145,6 +160,7 @@ public class Navigator {
 		else{
 			Sound.beep();
 			Sound.beep();
+			sensorMotor.setAcceleration(200);
 			sensorMotor.rotate(90);
 			destAngle = (currTheta-90.0);
 			if (destAngle<0)
@@ -161,29 +177,49 @@ public class Navigator {
 		while (true){
 			leftMotor.forward();
 			rightMotor.forward();
-			if (!thereIsObject)
+			if (!thereIsObjectCloseish)
 				break;
 		}
+		Sound.beepSequenceUp();
 		//let the robot's body move past the obstacle before stopping.
 		try{ Thread.sleep(BUFFER_TIME*10);
 		} catch(InterruptedException e) {e.printStackTrace();}
 		stopMotors();	
+		Sound.beepSequence();
 		
 		//turn, and then 
 		currTheta = odo.getAng();
 		if (left){
+			destAngle = (currTheta-90.0);
 			if (destAngle<0)
 				destAngle = destAngle + 360;
 			turnTo(destAngle, true);
 		}
-		
 		else{
 			destAngle = (currTheta+90.0)%360;
 			turnTo(destAngle, true);	
 		}
 		
+		
 		//travel forward some distance
-		travelForwards2(ESCAPE_DIST);
+		setSpeeds(HALF_SPEED, HALF_SPEED);
+		leftMotor.forward();
+		rightMotor.forward();
+		try {Thread.sleep(BUFFER_TIME*8);
+		} catch (InterruptedException e) {e.printStackTrace();}
+		while (true){
+			leftMotor.forward();
+			rightMotor.forward();
+			if (!thereIsObjectCloseish)
+				break;
+		}
+		Sound.beepSequenceUp();
+		//let the robot's body move past the obstacle before stopping.
+		try{ Thread.sleep(BUFFER_TIME*10);
+		} catch(InterruptedException e) {e.printStackTrace();}
+		stopMotors();	
+		Sound.beepSequence();
+		
 		
 		// put sensors back
 		if (left){
@@ -251,11 +287,11 @@ public class Navigator {
 		sensorMotor.setAcceleration(200);
 		sensorMotor.rotate(90); // look left
 		try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
-		if (thereIsObject){
+		if (thereIsObjectCloseish){
 			Sound.buzz();
 			sensorMotor.rotate(-180); //look right
 			try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}//(wait a second)
-			if (thereIsObject){
+			if (thereIsObjectCloseish){
 				Sound.buzz();
 				info[0] = false;
 				info[1] = false;
@@ -427,11 +463,17 @@ public class Navigator {
 	 */
 	public void setDetectionInfo(boolean[] info, boolean[] update){
 		if (update[0])
-			this.thereIsObject =info[0];
+			this.thereIsObject = info[0];
 		if (update[1])
-			this.thereIsObjectWithinD = info[1];
+			this.thereIsObjectCloseish =info[1];
 		if (update[2])
-			this.objectColorSeen = info[2];
+			this.thereIsObjectWithinD = info[2];
+		if (update[3])
+			this.objectColorSeen = info[3];
+	}
+	
+	public void setObjectDist(int dist){
+		this.objectDist = dist;
 	}
 	
 	/**

@@ -24,7 +24,7 @@ import lejos.robotics.geometry.Point2D;
  * @author Solvie Lee
  *
  */
-public class Robot1 {
+public class Robot2 {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
@@ -74,7 +74,7 @@ public class Robot1 {
 		obstacles = new Point2D[NUM_OBSTACLES];
 		
 		
-		//-----------------------SET UP WIFI-------------------------//
+		//OPPONENT ZONE HARDCODED< GO FIX WHEN UNCOMMENTING THIS-----------------------SET UP WIFI-------------------------//
 		WifiConnection conn = null;
 		try {
 			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
@@ -103,10 +103,11 @@ public class Robot1 {
 		}
 		// stall until user decides to end program
 		//Button.ESCAPE.waitForPress(); 
+
+		//------------------------------------------------------------//
 		LCD.clear();
 		display = new Display();
 		display.setPart(0);
-		//------------------------------------------------------------//
 		
 		/*
 		int option = 0;

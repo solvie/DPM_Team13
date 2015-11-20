@@ -19,8 +19,8 @@ import lejos.utility.Timer;
 public class ObjectDetector implements TimerListener {
 	
 	public static final int errorMargin = 2, DEFAULT_INTERVAL = 25, offFactor = 20;
-	private static final int OBJECT_CLOSE = 7, OBJECT_FAR = 15, MAX_RANGE = 120;
-	private boolean objectDetected, objectClose, objectColorSeen, flagDetected;
+	private static final int OBJECT_FAR = 50, OBJECT_CLOSE = 5, OBJECT_CLOSEISH = 15, MAX_RANGE = 120;
+	private boolean objectDetected, objectCloseish, objectClose, objectColorSeen, flagDetected;
 	private SampleProvider usValue, colorSensor, colorSensor2;
 	private int  distance, realdistance, lastcolor2, deltacolor2, filter, filter_out = 10;
 	private float[] usData, colorData, colorData2;
@@ -40,6 +40,8 @@ public class ObjectDetector implements TimerListener {
 	public ObjectDetector(Navigator navi, SampleProvider usValue, float[] usData,
 			SampleProvider colorSensor, float[] colorData, SampleProvider colorSensor2, float[] colorData2, boolean autostart){
 		this.objectDetected = false;
+		this.objectCloseish = false;
+		this.distance = MAX_RANGE;
 		this.usValue = usValue;
 		this.usData = usData;
 		this.colorSensor = colorSensor;
@@ -82,7 +84,7 @@ public class ObjectDetector implements TimerListener {
 		
 		}
 			//Tell the navi the information.
-		updateNavi(OBJECT_FAR, OBJECT_CLOSE);
+		updateNavi(OBJECT_FAR, OBJECT_CLOSEISH, OBJECT_CLOSE);
 		
 	}
 	
@@ -110,19 +112,25 @@ public class ObjectDetector implements TimerListener {
 	 * @param farDist Distance within which the object detector will say an object has been detected
 	 * @param closeDist Distance within which the object detector will say an object is close
 	 */
-	public void updateNavi(double farDist, double closeDist){
+	public void updateNavi(double farDist, double closeishDist, double closeDist){
 		//notify navi if object 
 		if (realdistance <= farDist)
 			objectDetected = true;
 		else
 			objectDetected = false;
+		//notify navi if object closeish 
+		if (realdistance <= closeishDist)
+			objectCloseish = true;
+		else
+			objectCloseish = false;
 		//notify navi if object is within closeDist away
 		if(realdistance<= closeDist)
 			objectClose = true;
 		else
 			objectClose = false;
 		
-		navi.setDetectionInfo(new boolean[]{objectDetected, objectClose, false},new boolean[]{true, true, false});
+		navi.setDetectionInfo(new boolean[]{objectDetected, objectCloseish, objectClose, false},new boolean[]{true, true, true, false});
+		navi.setObjectDist(realdistance);
 	}
 	
 	/**
