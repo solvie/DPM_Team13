@@ -138,7 +138,6 @@ public class Navigator {
 		if (left){
 			Sound.beep();
 			Sound.beep();
-			sensorMotor.setAcceleration(200);
 			sensorMotor.rotate(-90);
 			destAngle = (currTheta+90.0)%360;
 			turnTo(destAngle, true);
@@ -146,7 +145,6 @@ public class Navigator {
 		else{
 			Sound.beep();
 			Sound.beep();
-			sensorMotor.setAcceleration(200);
 			sensorMotor.rotate(90);
 			destAngle = (currTheta-90.0);
 			if (destAngle<0)
