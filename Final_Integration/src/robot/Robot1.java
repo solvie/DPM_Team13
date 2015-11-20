@@ -1,8 +1,11 @@
 
 package robot;
 
+import java.io.IOException;
+
 import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
@@ -39,6 +42,10 @@ public class Robot1 {
 	private static FlagCapturer flagCapturer;
 	private static Point2D[] obstacles, landmarks;
 	private static final int NUM_OBSTACLES = 20;
+	private static final String SERVER_IP = "192.168.43.135";
+	private static final int TEAM_NUMBER = 13;
+	private static int homeZoneBL_X, homeZoneBL_Y, opponentHomeZoneBL_X, opponentHomeZoneBL_Y,
+	dropZone_X, dropZone_Y, flagType, opponentFlagType;
 	
 
 	public static void main(String[] args){
@@ -57,9 +64,7 @@ public class Robot1 {
 		SampleProvider colorValue2 = colorSensor2.getMode("ColorID");//TODO: change mode?
 		float[] colorData2 = new float[colorValue2.sampleSize()];
 	
-		//Set up display
-		display = new Display();
-		display.setPart(0);
+
 		
 		odo = new Odometer(leftMotor, rightMotor);
 		navi = new Navigator(odo, sensorMotor);
@@ -68,6 +73,42 @@ public class Robot1 {
 		pathFinder = new PathFinder(obDetector);
 		obstacles = new Point2D[NUM_OBSTACLES];
 		
+		
+		//-----------------------SET UP WIFI-------------------------//
+		WifiConnection conn = null;
+		try {
+			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+		} catch (IOException e) {
+			LCD.drawString("Connection failed", 0, 8);
+		}
+		
+		// example usage of Transmission class
+		Transmission t = conn.getTransmission();
+		if (t == null) {
+			LCD.drawString("Failed to read transmission", 0, 5);
+		} else {
+			t.coordinatesTransfo(8);
+			StartCorner corner = t.getStartingCorner();
+			homeZoneBL_X = t.homeZoneBL_X;
+			homeZoneBL_Y = t.homeZoneBL_Y;
+			opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
+			opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
+			dropZone_X = t.dropZone_X;
+			dropZone_Y = t.dropZone_Y;
+			flagType = t.flagType;
+			opponentFlagType = t.opponentFlagType;
+			
+			// print out the transmission information
+			conn.printTransmission();
+		}
+		// stall until user decides to end program
+		//Button.ESCAPE.waitForPress(); 
+		LCD.clear();
+		display = new Display();
+		display.setPart(0);
+		//------------------------------------------------------------//
+		
+		/*
 		int option = 0;
 		while (option == 0)
 			option = Button.waitForAnyPress(); // ID Right executes
@@ -81,6 +122,9 @@ public class Robot1 {
 			System.exit(-1);
 			break;
 		}
+		*/
+		
+		execute();
 	}
 	/**
 	 * This method executes the main program. The robot will wait until it is given its coordinates and its 
@@ -104,7 +148,7 @@ public class Robot1 {
 	 * Localizes to the coordinates given
 	 */
 	public static void localize(Point2D[] landmarks){
-		display.setPart(1);
+		//display.setPart(1);
 		//instantiate localizer
 		// recieve input coordinates
 		
@@ -118,14 +162,17 @@ public class Robot1 {
 	 * This method uses the navigator to go to the enemy base while avoiding obstacles along the way
 	 */
 	public static void findEnemyBase(){
-		display.setPart(2);
-		double x=60, y=60; //Hardcoded to 60,60 for now
+		//display.setPart(2);
+		double x, y; //Hardcoded to 60,60 for now
+		x = opponentHomeZoneBL_X;
+		y = opponentHomeZoneBL_Y;
 		//TODO set x and y to the coordinates of the enemy base 
 		
 		// instantiate pathfinder and empty obstacles array
 		pathFinder = new PathFinder(obDetector);
 		//go to the path. 
 		pathFinder.findPathTo(x, y, obstacles);
+		return;
 		
 	}
 	/**
