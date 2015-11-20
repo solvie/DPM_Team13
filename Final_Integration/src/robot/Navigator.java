@@ -102,12 +102,17 @@ public class Navigator {
 		rightMotor.setSpeed(FORWARD_SPEED);
 		// while the distance has not been fully reached, go forward until object is noticed.
 		boolean latch = true;
+		boolean stopped = false;
 		while ((Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance)) {
 				leftMotor.forward();
 				rightMotor.forward();
 				if(thereIsObject&& latch){
 					//to handle the angled object case.
-					distance = objectDist-2.5;
+					double newdistance = objectDist-2.5;
+					if (newdistance<distance){
+						distance = newdistance;
+						stopped = true;
+					}
 					Sound.beep();
 					Sound.beep();
 					latch=false;
@@ -128,7 +133,7 @@ public class Navigator {
 		}
 		leftMotor.stop(true);
 		rightMotor.stop(true);
-		if (latch==false){
+		if (latch==false&&stopped==true){
 			result[0] = false;
 			result[1] = true;
 			return result;

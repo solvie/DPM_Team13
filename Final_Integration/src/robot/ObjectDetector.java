@@ -24,6 +24,8 @@ public class ObjectDetector implements TimerListener {
 	private SampleProvider usValue, colorSensor, colorSensor2;
 	private int  distance, realdistance, lastcolor2, deltacolor2, filter, filter_out = 10;
 	private float[] usData, colorData, colorData2;
+	private int deltarealdis;
+	private int lastdis;
 	private Timer timer;
 	private Navigator navi;
 	private ArrayList<Integer> Data = new ArrayList<Integer>();
@@ -49,6 +51,7 @@ public class ObjectDetector implements TimerListener {
 		this.colorSensor2 = colorSensor2;
 		this.colorData2 = colorData2;
 		this.realdistance = getdistance();
+		this.lastdis=realdistance;
 		this.navi = navi;
 		this.timer = new Timer(DEFAULT_INTERVAL, this);
 		if (autostart)
@@ -77,6 +80,9 @@ public class ObjectDetector implements TimerListener {
 				realdistance = currentrealdis;
 				filter = 0;
 			}
+			deltarealdis=this.getrealdis()-lastdis;
+			lastdis=this.getrealdis();
+			
 			deltacolor2 = this.getcolor2() - lastcolor2;
 			lastcolor2 = this.getcolor2();
 			
@@ -150,10 +156,10 @@ public class ObjectDetector implements TimerListener {
 	 * Color sensor in the front
 	 * @return
 	 */
-	public int getcolor1(){
+	public int[] getcolor1(){
 		synchronized (this){
 			colorSensor.fetchSample(colorData, 0);
-			int color=(int)(colorData[0]*100);	
+			int[] color=new int[]{(int)(colorData[0]*1000),(int)(colorData[1]*1000),(int)(colorData[2]*1000)};
 			return color;
 		}
 	}
@@ -186,6 +192,11 @@ public class ObjectDetector implements TimerListener {
 	public int getdeltacolor2(){
 		synchronized (this){
 			return deltacolor2;}
+	}
+	
+	public int getdeltarealdis(){
+		synchronized (this){
+			return deltarealdis;}
 	}
 	
 	/**

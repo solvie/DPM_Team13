@@ -24,7 +24,7 @@ import lejos.robotics.geometry.Point2D;
  * @author Solvie Lee
  *
  */
-public class Robot2 {
+public class Robot3 {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
@@ -38,13 +38,13 @@ public class Robot2 {
 	private static ObjectDetector obDetector;
 	private static Localizer loca;
 	private static PathFinder pathFinder;
-	private static FlagFinder flagFinder;
-	private static FlagCapturer flagCapturer;
+	private static Search search;
+	private static Flagcapturer flagCapturer;
 	private static Point2D[] obstacles, landmarks;
 	private static final int NUM_OBSTACLES = 20;
 	private static final String SERVER_IP = "192.168.43.135";
 	private static final int TEAM_NUMBER = 13;
-	private static int homeZoneBL_X, homeZoneBL_Y, opponentHomeZoneBL_X, opponentHomeZoneBL_Y,
+	private static int homeZoneBL_X, homeZoneBL_Y, opponentHomeZoneBL_X, opponentHomeZoneBL_Y,opponentHomeZoneTR_X, opponentHomeZoneTR_Y,
 	dropZone_X, dropZone_Y, flagType, opponentFlagType;
 	
 
@@ -56,7 +56,7 @@ public class Robot2 {
 		
 		//Set up the color sensor for object detection
 		SensorModes colorSensor = new EV3ColorSensor(colorPort);
-		SampleProvider colorValue = colorSensor.getMode("ColorID");//TODO: change mode?
+		SampleProvider colorValue = colorSensor.getMode("RGB");//TODO: change mode?
 		float[] colorData = new float[colorValue.sampleSize()];
 		
 		//Set up light sensor for odo
@@ -71,10 +71,12 @@ public class Robot2 {
 		obDetector = new ObjectDetector(navi, usValue, usData, colorValue, colorData, colorValue2, colorData2, true);
 		loca = new Localizer(obDetector);
 		pathFinder = new PathFinder(obDetector);
+		flagCapturer = new Flagcapturer(armMotor);
 		obstacles = new Point2D[NUM_OBSTACLES];
 		
 		
-		//OPPONENT ZONE HARDCODED< GO FIX WHEN UNCOMMENTING THIS-----------------------SET UP WIFI-------------------------//
+		
+	/*	//OPPONENT ZONE HARDCODED< GO FIX WHEN UNCOMMENTING THIS-----------------------SET UP WIFI-------------------------//
 		WifiConnection conn = null;
 		try {
 			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
@@ -93,6 +95,8 @@ public class Robot2 {
 			homeZoneBL_Y = t.homeZoneBL_Y;
 			opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
 			opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
+			opponentHomeZoneTR_X = t.opponentHomeZoneTR_X;
+			opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y;
 			dropZone_X = t.dropZone_X;
 			dropZone_Y = t.dropZone_Y;
 			flagType = t.flagType;
@@ -104,7 +108,7 @@ public class Robot2 {
 		// stall until user decides to end program
 		//Button.ESCAPE.waitForPress(); 
 
-		//------------------------------------------------------------//
+		//------------------------------------------------------------//*/
 		LCD.clear();
 		display = new Display();
 		display.setPart(0);
@@ -125,6 +129,11 @@ public class Robot2 {
 		}
 		*/
 		
+		opponentHomeZoneBL_X = 65;
+		opponentHomeZoneBL_Y = 60;
+		opponentHomeZoneTR_X = 95;
+		opponentHomeZoneTR_Y = 90;
+		
 		execute();
 	}
 	/**
@@ -139,7 +148,7 @@ public class Robot2 {
 		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
 		localize(landmarks);
 		findEnemyBase();
-		//findFlag();
+		findFlag();
 		//captureFlag();
 		//returnHomeBase();
 		//execute the rest of the program.
@@ -165,14 +174,15 @@ public class Robot2 {
 	public static void findEnemyBase(){
 		//display.setPart(2);
 		double x, y; //Hardcoded to 60,60 for now
-		x = opponentHomeZoneBL_X;
-		y = opponentHomeZoneBL_Y;
+		x = opponentHomeZoneBL_X-15;
+		y = opponentHomeZoneBL_Y-15;
 		//TODO set x and y to the coordinates of the enemy base 
 		
 		// instantiate pathfinder and empty obstacles array
-		pathFinder = new PathFinder(obDetector);
+		//pathFinder = new PathFinder(obDetector);
 		//go to the path. 
 		pathFinder.findPathTo(x, y, obstacles);
+		navi.travelTo(opponentHomeZoneBL_X-15, opponentHomeZoneTR_Y-15);
 		return;
 		
 	}
@@ -183,8 +193,13 @@ public class Robot2 {
 		display.setPart(3);
 		// search enemy zone for the flag
 		Point2D[] enemyZone= null; //TODO set this to enemy zone coordinates
-		flagFinder = new FlagFinder(obDetector);
-		flagFinder.search(enemyZone);
+		Point2D point1=new Point2D.Double(opponentHomeZoneBL_X,opponentHomeZoneBL_Y);
+		Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);
+		Point2D point3=new Point2D.Double(0,0);
+		
+		
+		Search search=new Search(obDetector,flagCapturer,sensorMotor);
+		search.searching(point1, point2, point3, 4);
 	}
 	
 	/**
@@ -193,8 +208,7 @@ public class Robot2 {
 	public static void captureFlag(){
 		display.setPart(4);
 		//capture the flag with the arm
-		flagCapturer = new FlagCapturer(armMotor);
-		flagCapturer.capture();
+
 	}
 	
 	/**
