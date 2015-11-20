@@ -104,8 +104,7 @@ public class PathFinder {
 					}
 					//TODO: Check which direction it is facing when it gets to this point. 
 				}
-				obstacles = findPathTo(x, y, obstacles);
-				
+				obstacles = findPathTo(x, y, obstacles);	
 			}
 			else{
 				setOdoFlag(1);

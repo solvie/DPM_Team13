@@ -93,7 +93,7 @@ public class Robot1 {
 		
 		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
 		localize(landmarks);
-		//findEnemyBase();
+		findEnemyBase();
 		//findFlag();
 		//captureFlag();
 		//returnHomeBase();

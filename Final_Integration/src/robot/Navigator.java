@@ -202,21 +202,39 @@ public class Navigator {
 	 * @param theta heading to turn to
 	 * @param stop whether motors should stop
 	 */
-	public void turnTo(double angle, boolean stop) {
-		double error = normalize(angle) - this.odo.getAng();
-		while(Math.abs(error)>DEG_ERR){
-			error = normalize(angle)-this.odo.getAng();
-			if (error<-180.0){
+	public void turnTo(double theta, boolean stop) {
+		double error = normalize(theta) - odo.getAng(), abserror;
+		boolean turn = false;
+		if (Math.abs(error)>DEG_ERR)
+			turn = true;
+		
+		while (turn){//changed from while Math.abs(error)> DEG_ERR
+			error = normalize(theta) - this.odo.getAng();
+			abserror = Math.abs(error);
+			
+			if (error < -180.0) {
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
-			} else if (error <0.0){
+				if (abserror < DEG_ERR)
+					break;
+			} else if (error < 0.0) {
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
-			} else if (error>180.0){
+				if (abserror < DEG_ERR)
+					break;
+			} else if (error > 180.0) {
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			} else {
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
+				if (abserror < DEG_ERR)
+					break;
 			}
-			
 		}
+
+		if (stop) {
+			this.setSpeeds(0, 0);
+		}
+
 	}
 	
 	public double normalize(double deg){
