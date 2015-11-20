@@ -77,7 +77,7 @@ public class Robot1_pf2 {
 		obDetector.start();
 		
 		
-		pathFinder.findPathTo(60,60, obstacles);
+		pathFinder.findPathTo(60,65, obstacles);
 	
 		int option = 0;
 		while (option == 0)
