@@ -330,13 +330,9 @@ public class Navigator {
 		currX = odo.getX();
 		currY = odo.getY();
 		while(Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance){
-			leftMotor.setSpeed(HALF_SPEED);
-			rightMotor.setSpeed(HALF_SPEED);
-			leftMotor.backward();
-			rightMotor.backward();
+			this.setSpeeds(-HALF_SPEED,-HALF_SPEED);
 		}
-		leftMotor.stop(true);
-		rightMotor.stop(true);
+		this.setSpeeds(0,0);
 		
 	}
 	
@@ -349,15 +345,11 @@ public class Navigator {
 		currX = odo.getX();
 		currY = odo.getY();
 		while(Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance){
-			leftMotor.setSpeed(HALF_SPEED);
-			rightMotor.setSpeed(HALF_SPEED);
-			leftMotor.forward();
-			rightMotor.forward();
+			this.setSpeeds(HALF_SPEED, HALF_SPEED);
 			if (thereIsObject)
 				break;
 		}
-		leftMotor.stop(true);
-		rightMotor.stop(true);
+		this.setSpeeds(0,0);
 		
 	}
 	

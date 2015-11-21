@@ -17,7 +17,7 @@ import lejos.utility.Delay;
 public class Localizer {
 	
 	private static final int ROTATION_SPEED = 150;
-	private static final double SENSORDIS = 11.15;
+	private static final double SENSORDIS = 11.2;
 	private int limitdis = 32;
 	private ObjectDetector detector;
 	private Odometer odo;

@@ -12,7 +12,7 @@ public class Flagcapturer {
 	}
 	
 	public void up(){
-		arm.rotate(-180,true);
+		arm.rotate(-90,true);
 		while(!arm.isStalled()){
 			arm.rotate(-6,true);}
 		arm.rotate(15,true);

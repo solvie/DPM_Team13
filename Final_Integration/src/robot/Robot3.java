@@ -42,9 +42,9 @@ public class Robot3 {
 	private static Flagcapturer flagCapturer;
 	private static Point2D[] obstacles, landmarks;
 	private static final int NUM_OBSTACLES = 20;
-	private static final String SERVER_IP = "192.168.43.135";
+	private static final String SERVER_IP = "192.168.43.6";
 	private static final int TEAM_NUMBER = 13;
-	private static int homeZoneBL_X, homeZoneBL_Y, opponentHomeZoneBL_X, opponentHomeZoneBL_Y,opponentHomeZoneTR_X, opponentHomeZoneTR_Y,
+	private static double homeZoneBL_X, homeZoneBL_Y, opponentHomeZoneBL_X, opponentHomeZoneBL_Y,opponentHomeZoneTR_X, opponentHomeZoneTR_Y,
 	dropZone_X, dropZone_Y, flagType, opponentFlagType;
 	
 
@@ -76,7 +76,7 @@ public class Robot3 {
 		
 		
 		
-	/*	//OPPONENT ZONE HARDCODED< GO FIX WHEN UNCOMMENTING THIS-----------------------SET UP WIFI-------------------------//
+	//-----------------------SET UP WIFI-------------------------//
 		WifiConnection conn = null;
 		try {
 			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
@@ -91,14 +91,14 @@ public class Robot3 {
 		} else {
 			t.coordinatesTransfo(8);
 			StartCorner corner = t.getStartingCorner();
-			homeZoneBL_X = t.homeZoneBL_X;
-			homeZoneBL_Y = t.homeZoneBL_Y;
-			opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
-			opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
-			opponentHomeZoneTR_X = t.opponentHomeZoneTR_X;
-			opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y;
-			dropZone_X = t.dropZone_X;
-			dropZone_Y = t.dropZone_Y;
+			homeZoneBL_X = t.homeZoneBL_X*30.48;
+			homeZoneBL_Y = t.homeZoneBL_Y*30.48;
+			opponentHomeZoneBL_X = t.opponentHomeZoneBL_X*30.48;
+			opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y*30.48;
+			opponentHomeZoneTR_X = t.opponentHomeZoneTR_X*30.48;
+			opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y*30.48;
+			dropZone_X = t.dropZone_X*30.48;
+			dropZone_Y = t.dropZone_Y*30.48;
 			flagType = t.flagType;
 			opponentFlagType = t.opponentFlagType;
 			
@@ -108,7 +108,7 @@ public class Robot3 {
 		// stall until user decides to end program
 		//Button.ESCAPE.waitForPress(); 
 
-		//------------------------------------------------------------//*/
+		//------------------------------------------------------------//
 		LCD.clear();
 		display = new Display();
 		display.setPart(0);
@@ -128,11 +128,11 @@ public class Robot3 {
 			break;
 		}
 		*/
-		
+		/*
 		opponentHomeZoneBL_X = 65;
 		opponentHomeZoneBL_Y = 60;
 		opponentHomeZoneTR_X = 95;
-		opponentHomeZoneTR_Y = 90;
+		opponentHomeZoneTR_Y = 90;*/
 		
 		execute();
 	}
@@ -158,7 +158,7 @@ public class Robot3 {
 	 * Localizes to the coordinates given
 	 */
 	public static void localize(Point2D[] landmarks){
-		//display.setPart(1);
+		display.setPart(1);
 		//instantiate localizer
 		// recieve input coordinates
 		
@@ -172,17 +172,17 @@ public class Robot3 {
 	 * This method uses the navigator to go to the enemy base while avoiding obstacles along the way
 	 */
 	public static void findEnemyBase(){
-		//display.setPart(2);
+		display.setPart(2);
 		double x, y; //Hardcoded to 60,60 for now
-		x = opponentHomeZoneBL_X-15;
-		y = opponentHomeZoneBL_Y-15;
+		x = opponentHomeZoneBL_X;
+		y = opponentHomeZoneBL_Y;
 		//TODO set x and y to the coordinates of the enemy base 
 		
 		// instantiate pathfinder and empty obstacles array
 		//pathFinder = new PathFinder(obDetector);
 		//go to the path. 
 		pathFinder.findPathTo(x, y, obstacles);
-		navi.travelTo(opponentHomeZoneBL_X-15, opponentHomeZoneTR_Y-15);
+		
 		return;
 		
 	}
@@ -192,6 +192,7 @@ public class Robot3 {
 	public static void findFlag(){
 		display.setPart(3);
 		// search enemy zone for the flag
+		navi.travelTo(opponentHomeZoneBL_X-15, opponentHomeZoneTR_Y-15);
 		Point2D[] enemyZone= null; //TODO set this to enemy zone coordinates
 		Point2D point1=new Point2D.Double(opponentHomeZoneBL_X,opponentHomeZoneBL_Y);
 		Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);
