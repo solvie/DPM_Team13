@@ -1,7 +1,7 @@
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Navigation {
-	final static int FAST = 150, SLOW = 100, ACCELERATION = 3000;
+	final static int FAST = 200, SLOW = 100, ACCELERATION = 3000;
 	final static double DEG_ERR = 0.5, CM_ERR = 1.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
@@ -108,7 +108,7 @@ public class Navigation {
 		currX = odometer.getX();
 		currY = odometer.getY();
 		while(Math.sqrt(Math.pow(odometer.getX() - currX, 2) + Math.pow(odometer.getY() - currY, 2)) < distance){
-			this.setSpeeds(-SLOW,-SLOW);}
+			this.setSpeeds(-FAST,-FAST);}
 		this.setSpeeds(0,0);
 		
 	}
@@ -118,7 +118,7 @@ public class Navigation {
 		currX = odometer.getX();
 		currY = odometer.getY();
 		while(Math.sqrt(Math.pow(odometer.getX() - currX, 2) + Math.pow(odometer.getY() - currY, 2)) < distance){
-			this.setSpeeds(SLOW,SLOW);}
+			this.setSpeeds(FAST,FAST);}
 		this.setSpeeds(0,0);
 	}
 	

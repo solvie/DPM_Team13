@@ -4,7 +4,7 @@ import lejos.hardware.Sound;
 import lejos.utility.Delay;
 
 public class Localization {
-	public static final int ROTATION_SPEED = 150;
+	public static final int ROTATION_SPEED = 200;
 	private static final double sensordis=11.6;
 	private int limitdis=32;
 	private Odometer odo;

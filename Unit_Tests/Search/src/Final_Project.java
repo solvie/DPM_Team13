@@ -7,6 +7,7 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 import lejos.robotics.geometry.Point2D;
+import lejos.utility.Delay;
 
 
 public class Final_Project {
@@ -47,11 +48,11 @@ public class Final_Project {
 			Point2D point2=new Point2D.Double(75,105);
 			Point2D point3=new Point2D.Double(0,0);
 			Search search=new Search(odo,detector,arm,sensorMotor);
-			search.searching(point1, point2, point3, 4);
+			search.searching(point1, point2, point3, 5, 3);
 			
-//			test testing=new test(odo,detector);
+//			test testing=new test(odo,detector,arm);
 //			testing.testing();
-//			arm.down();
+			
 		}
 		
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
