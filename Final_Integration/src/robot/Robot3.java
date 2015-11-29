@@ -166,6 +166,7 @@ public class Robot3 {
 	 * This method uses the navigator to go to the enemy base while avoiding obstacles along the way
 	 */
 	public static void findEnemyBase(){
+		//odo.startOdoCorrection(obDetector);
 		display.setPart(2);
 		double x, y; //Hardcoded to 60,60 for now
 		x = opponentHomeZoneBL_X;

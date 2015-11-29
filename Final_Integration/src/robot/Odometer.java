@@ -80,6 +80,17 @@ public class Odometer implements TimerListener {
 		this.timer = new Timer((INTERVAL <= 0) ? INTERVAL : DEFAULT_TIMEOUT_PERIOD, this);
 		this.timer.start();
 	}
+	
+	public void startOdoCorrection(ObjectDetector detector){
+		//creation of the correction, might need to run on a different thread???
+		final OdometerCorrection correctionOdo = new OdometerCorrection(this, detector);
+		
+		(new Thread(){
+			public void run(){
+				correctionOdo.run();
+			}
+		}).start(); 
+	}
 
 	/**
 	 * Function to stop the timerlistener
