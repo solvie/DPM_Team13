@@ -27,7 +27,7 @@ public class Navigator {
 	private EV3LargeRegulatedMotor leftMotor, rightMotor, sensorMotor;
 	private Point2D[] knownObstacles;
 	private boolean thereIsObject, thereIsObjectCloseish, thereIsObjectWithinD, objectColorSeen;
-	private int objectDist;
+	private double objectDist;
 	
 	/**
 	 * Default constructor
@@ -108,7 +108,8 @@ public class Navigator {
 				rightMotor.forward();
 				if(thereIsObject&& latch){
 					//to handle the angled object case.
-					double newdistance = objectDist-2.5;
+					double alreadyTravelledDist = Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2));
+					double newdistance = alreadyTravelledDist+ objectDist -2.5;
 					if (newdistance<distance){
 						distance = newdistance;
 						stopped = true;
@@ -469,7 +470,7 @@ public class Navigator {
 			this.objectColorSeen = info[3];
 	}
 	
-	public void setObjectDist(int dist){
+	public void setObjectDist(double dist){
 		this.objectDist = dist;
 	}
 	
