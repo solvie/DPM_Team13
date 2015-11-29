@@ -8,6 +8,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
  * motions used for specific purposes.
  * 
  * @author Scotty Conrad
+ * @version 1.0
  *
  */
 public class armMotion {
