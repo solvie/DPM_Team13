@@ -11,18 +11,29 @@ public class Flagcapturer {
 		arm.setStallThreshold(8, 20);
 	}
 	
-	public void up(){
-		arm.rotate(-90,true);
-		while(!arm.isStalled()){
-			arm.rotate(-6,true);}
-		arm.rotate(15,true);
+	public synchronized void up(){
+		arm.setAcceleration(25);
+
+		arm.rotateTo(-60);
 	}
 	
-	public void down(){
-		arm.rotate(180,true);
-		while(!arm.isStalled()){
-			arm.rotate(6,true);}
-		arm.rotate(-15,true);
+	public synchronized void down(){
+		arm.setAcceleration(50);
+
+		arm.rotateTo(200);
+		arm.flt(true);
+	}
+	
+	public synchronized void grab(){
+		arm.setAcceleration(50);
+		arm.rotateTo(-15);
+	}
+	
+	public synchronized void throwaway(){
+		arm.setAcceleration(1000);
+
+		arm.rotateTo(-180);
+		arm.flt(true);
 	}
 	
 }

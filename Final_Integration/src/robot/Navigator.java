@@ -325,7 +325,7 @@ public class Navigator {
 	 * Method to allow robot to travel backwards a set distance
 	 * @param distance amount to travel
 	 */
-	public void travelBackwards(int distance){
+	public void travelBackwards(double distance){
 		double currX, currY;
 		currX = odo.getX();
 		currY = odo.getY();

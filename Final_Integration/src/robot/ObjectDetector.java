@@ -176,6 +176,28 @@ public class ObjectDetector implements TimerListener {
 		}
 	}
 	
+	//light blue:1 ; red:2 ; yellow:3 ; white:4 ; dark blue:5 
+	public int getcolornumber(){
+		synchronized (this){
+			int all=this.getcolor1()[0]+this.getcolor1()[1]+this.getcolor1()[2];
+			if(all==0)
+				all=1;
+			double r=(double)this.getcolor1()[0]/all;
+			double g=(double)this.getcolor1()[1]/all;
+			double b=(double)this.getcolor1()[2]/all;
+			if(r>0.65 && g<0.2)
+				return 2;
+			else if(r>0.4 && g>0.38)
+				return 3;
+			else if(b>0.4 && r<0.18)
+				return 5;
+			else if(r>0.3)
+				return 4;
+			else
+				return 1;
+		}
+	}
+	
 	/**
 	 * Get filtered distance value
 	 * @return

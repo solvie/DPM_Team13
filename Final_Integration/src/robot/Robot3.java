@@ -45,7 +45,8 @@ public class Robot3 {
 	private static final String SERVER_IP = "192.168.43.6";
 	private static final int TEAM_NUMBER = 13;
 	private static double homeZoneBL_X, homeZoneBL_Y, opponentHomeZoneBL_X, opponentHomeZoneBL_Y,opponentHomeZoneTR_X, opponentHomeZoneTR_Y,
-	dropZone_X, dropZone_Y, flagType, opponentFlagType;
+	dropZone_X, dropZone_Y;
+	private static int flagType, opponentFlagType;
 	
 
 	public static void main(String[] args){
@@ -76,7 +77,7 @@ public class Robot3 {
 		
 		
 		
-	//-----------------------SET UP WIFI-------------------------//
+	/*//-----------------------SET UP WIFI-------------------------//
 		WifiConnection conn = null;
 		try {
 			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
@@ -108,7 +109,7 @@ public class Robot3 {
 		// stall until user decides to end program
 		//Button.ESCAPE.waitForPress(); 
 
-		//------------------------------------------------------------//
+		//------------------------------------------------------------//*/
 		LCD.clear();
 		display = new Display();
 		display.setPart(0);
@@ -128,11 +129,11 @@ public class Robot3 {
 			break;
 		}
 		*/
-		/*
+		
 		opponentHomeZoneBL_X = 65;
 		opponentHomeZoneBL_Y = 60;
 		opponentHomeZoneTR_X = 95;
-		opponentHomeZoneTR_Y = 90;*/
+		opponentHomeZoneTR_Y = 90;
 		
 		execute();
 	}
@@ -142,13 +143,12 @@ public class Robot3 {
 	 * it will perform the localization and block finding routines in sequence.
 	 */
 	public static void execute(){
-		landmarks = new Point2D[3]; //SET enemy base index 0, home base 1, starting position 2
 		//(package for Wifi communications not available yet on mycourses.) 
 		
 		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
-		localize(landmarks);
+		localize();
 		findEnemyBase();
-		findFlag();
+		//findFlag();
 		//captureFlag();
 		//returnHomeBase();
 		//execute the rest of the program.
@@ -157,14 +157,8 @@ public class Robot3 {
 	/**
 	 * Localizes to the coordinates given
 	 */
-	public static void localize(Point2D[] landmarks){
+	public static void localize(){
 		display.setPart(1);
-		//instantiate localizer
-		// recieve input coordinates
-		
-		//convert coordinates so that they are relative to the robot's 0,0.
-		//loca.convertCoordinates(landmarks);
-		//perform localization routine.
 		loca.doLocalization();
 		return;
 	}
@@ -176,13 +170,8 @@ public class Robot3 {
 		double x, y; //Hardcoded to 60,60 for now
 		x = opponentHomeZoneBL_X;
 		y = opponentHomeZoneBL_Y;
-		//TODO set x and y to the coordinates of the enemy base 
 		
-		// instantiate pathfinder and empty obstacles array
-		//pathFinder = new PathFinder(obDetector);
-		//go to the path. 
 		pathFinder.findPathTo(x, y, obstacles);
-		
 		return;
 		
 	}
@@ -192,15 +181,15 @@ public class Robot3 {
 	public static void findFlag(){
 		display.setPart(3);
 		// search enemy zone for the flag
-		navi.travelTo(opponentHomeZoneBL_X-15, opponentHomeZoneTR_Y-15);
-		Point2D[] enemyZone= null; //TODO set this to enemy zone coordinates
+		navi.travelTo(opponentHomeZoneBL_X-15, opponentHomeZoneTR_Y-25);
+		
 		Point2D point1=new Point2D.Double(opponentHomeZoneBL_X,opponentHomeZoneBL_Y);
 		Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);
 		Point2D point3=new Point2D.Double(0,0);
 		
 		
 		Search search=new Search(obDetector,flagCapturer,sensorMotor);
-		search.searching(point1, point2, point3, 4);
+		search.searching(point1, point2, point3, opponentFlagType, 3);
 	}
 	
 	/**
