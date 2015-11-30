@@ -189,7 +189,7 @@ public class Robot4 {
 	public static void findFlag(){
 		display.setPart(3);
 		// search enemy zone for the flag
-		navi.travelTo(opponentHomeZoneBL_X-15, opponentHomeZoneTR_Y-25);
+		navi.travelTo(opponentHomeZoneBL_X-15, opponentHomeZoneTR_Y-15);
 		
 		Point2D point1=new Point2D.Double(opponentHomeZoneBL_X,opponentHomeZoneBL_Y);
 		Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);

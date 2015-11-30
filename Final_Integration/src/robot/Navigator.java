@@ -42,7 +42,7 @@ public class Navigator {
 		this.thereIsObjectCloseish= false;
 		this.thereIsObjectWithinD = false;
 		this.objectColorSeen = false;
-		this.objectDist = 255;
+		this.objectDist = 50;
 	}
 	
 	
@@ -341,7 +341,7 @@ public class Navigator {
 	 * Method to allow robot to travel forwards a set distance
 	 * @param distance distance to travel
 	 */
-	public void travelForwards(int distance){
+	public void travelForwards(double distance){
 		double currX, currY;
 		currX = odo.getX();
 		currY = odo.getY();
@@ -354,30 +354,23 @@ public class Navigator {
 		
 	}
 	
-	/**
-	 * A method to travel forward by at least a certain distance, but more if there is an object next to it
-	 * @param escapeDist minimum distance to go.
-	 */
-	public void travelForwards2(int escapeDist){
+	public void travelBackwards2(double distance){
 		double currX, currY;
 		currX = odo.getX();
 		currY = odo.getY();
+		while(Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance){
+			this.setSpeeds(-FORWARD_SPEED,-FORWARD_SPEED);}
+		this.setSpeeds(0,0);
 		
-		setSpeeds(HALF_SPEED, HALF_SPEED);
-		leftMotor.forward();
-		rightMotor.forward();
-		try {Thread.sleep(BUFFER_TIME);
-		} catch (InterruptedException e) {e.printStackTrace();}
-		while (Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < escapeDist){
-			leftMotor.forward();
-			rightMotor.forward();
-			if (!thereIsObject)
-				break;
-		}
-		//let the robot's body move past the obstacle before stopping.
-		try{ Thread.sleep(BUFFER_TIME*10);
-		} catch(InterruptedException e) {e.printStackTrace();}
-		stopMotors();	
+	}
+	
+	public void travelForwards2(double distance){
+		double currX, currY;
+		currX = odo.getX();
+		currY = odo.getY();
+		while(Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2)) < distance){
+			this.setSpeeds(FORWARD_SPEED,FORWARD_SPEED);}
+		this.setSpeeds(0,0);
 	}
 	
 	/**

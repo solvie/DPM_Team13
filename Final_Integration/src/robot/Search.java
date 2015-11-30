@@ -60,7 +60,7 @@ public class Search {
 					// if sees the target flag, capture it
 					if(detector.getcolornumber()!=1){
 						Sound.beep();grab();
-						navigate.travelBackwards(10);
+						navigate.travelBackwards2(10);
 						double x0=odo.getX();
 						double y0=odo.getY();
 						navigate.travelTo(x0,point1.getY()-10);
@@ -69,10 +69,10 @@ public class Search {
 					}
 					// if detects as not target, throw it away
 					else{
-						navigate.travelBackwards(10);
+						navigate.travelBackwards2(10);
 						sensorMotor.rotate(-95);
 						arm.down();
-						navigate.travelForwards(12);
+						navigate.travelForwards2(12);
 						arm.throwaway();
 						sensorMotor.rotate(95);}
 				}
@@ -91,7 +91,7 @@ public class Search {
 			navigate.setSpeeds(-speed,-speed);
 			Delay.msDelay(25);
 			if(detector.getrealdis()<limit){
-				navigate.travelForwards(2);
+				navigate.travelForwards2(2);
 				navigate.turnTo(odo.getAng()+degrotate,true);
 				sensorMotor.rotate(-deg);
 				// call check method to do the color detection
@@ -127,32 +127,32 @@ public class Search {
 			if(detector.getcolornumber()!=1){
 				Sound.beep();grab();found=true;}
 			else{
-				navigate.travelBackwards(10);
+				navigate.travelBackwards2(10);
 				sensorMotor.rotate(-95);
 				arm.down();
-				navigate.travelForwards(12);
+				navigate.travelForwards2(12);
 				arm.throwaway();
 				sensorMotor.rotate(95);
 			}
 		}
 		// go back to point(x,y)
 		double dis=Math.sqrt(Math.pow(odo.getX()-x,2)+Math.pow(odo.getY()-y,2));
-		navigate.travelBackwards(dis);
+		navigate.travelBackwards2(dis);
 		navigate.turnTo(90,true);
 		if(!checked)
-			navigate.travelBackwards(5);
+			navigate.travelBackwards2(5);
 		else
-			navigate.travelBackwards(14);
+			navigate.travelBackwards2(14);
 		return found;
 	}
 	/**
 	 * method to capture the flag: move backwards a bit, put down the arm, and move forwards a bit, then lift arm up to capture flag
 	 */
 	public void grab(){
-		navigate.travelBackwards(10);
+		navigate.travelBackwards2(10);
 		sensorMotor.rotate(-95);
 		arm.down();
-		navigate.travelForwards(12);
+		navigate.travelForwards2(12);
 		arm.up();
 		sensorMotor.rotate(95);
 	}
@@ -162,7 +162,7 @@ public class Search {
 	public void putdown(){
 		sensorMotor.rotate(-95);
 		arm.down();
-		navigate.travelBackwards(10);
+		navigate.travelBackwards2(10);
 		arm.up();
 		sensorMotor.rotate(95);
 	}

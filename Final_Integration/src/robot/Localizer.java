@@ -12,11 +12,11 @@ import lejos.utility.Delay;
  * field it is, and provide the accurate initial information to the odometer. To be modified and filled in.
  * 
  * @version 1.0
- * @author Shawn Lu, Solvie Lee
+ * @author Shawn Lu
  */
 public class Localizer {
 	
-	private static final int ROTATION_SPEED = 150;
+	private static final int ROTATION_SPEED = 160;
 	private static final double SENSORDIS = 11.2;
 	private int limitdis = 32;
 	private ObjectDetector detector;
