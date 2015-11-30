@@ -4,6 +4,7 @@ package robot;
 import java.io.IOException;
 
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -24,7 +25,7 @@ import lejos.robotics.geometry.Point2D;
  * @author Solvie Lee
  *
  */
-public class Robot3 {
+public class Robot4 {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
@@ -73,7 +74,9 @@ public class Robot3 {
 		loca = new Localizer(obDetector);
 		pathFinder = new PathFinder(obDetector);
 		flagCapturer = new Flagcapturer(armMotor);
+		search=new Search(obDetector,flagCapturer,sensorMotor);
 		obstacles = new Point2D[NUM_OBSTACLES];
+		
 		
 		
 		
@@ -130,10 +133,14 @@ public class Robot3 {
 		}
 		*/
 		
-		opponentHomeZoneBL_X = 65;
-		opponentHomeZoneBL_Y = 60;
-		opponentHomeZoneTR_X = 95;
-		opponentHomeZoneTR_Y = 90;
+		opponentHomeZoneBL_X = 30.48*4;
+		opponentHomeZoneBL_Y = 30.48*4;
+		opponentHomeZoneTR_X = 30.48*6;
+		opponentHomeZoneTR_Y = 30.48*6;
+		dropZone_X = 30.48*2;
+		dropZone_Y = 30.48*2;
+		
+		opponentFlagType = 2;
 		
 		execute();
 	}
@@ -148,9 +155,8 @@ public class Robot3 {
 		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
 		localize();
 		findEnemyBase();
-		//findFlag();
-		//captureFlag();
-		//returnHomeBase();
+		findFlag();
+		returnHomeBase();
 		//execute the rest of the program.
 	}
 	
@@ -166,13 +172,14 @@ public class Robot3 {
 	 * This method uses the navigator to go to the enemy base while avoiding obstacles along the way
 	 */
 	public static void findEnemyBase(){
-		//odo.startOdoCorrection(obDetector);
+		odo.startOdoCorrection(obDetector);
 		display.setPart(2);
 		double x, y; //Hardcoded to 60,60 for now
 		x = opponentHomeZoneBL_X;
 		y = opponentHomeZoneBL_Y;
 		
-		pathFinder.findPathTo(x, y, obstacles);
+		
+		pathFinder.findPathTo(x-15, y-15, obstacles);
 		return;
 		
 	}
@@ -188,19 +195,9 @@ public class Robot3 {
 		Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);
 		Point2D point3=new Point2D.Double(0,0);
 		
-		
-		Search search=new Search(obDetector,flagCapturer,sensorMotor);
 		search.searching(point1, point2, point3, opponentFlagType, 3);
 	}
 	
-	/**
-	 * This method uses the robot's arm to capture the flag
-	 */
-	public static void captureFlag(){
-		display.setPart(4);
-		//capture the flag with the arm
-
-	}
 	
 	/**
 	 * This method allows the robot to return to the home base and drop the block
@@ -210,7 +207,11 @@ public class Robot3 {
 		//return the flag to the destination
 		double x=0, y=0;
 		//TODO set x and y to the coordinates of the home base
-		pathFinder.findPathTo(x,y, obstacles);
+		pathFinder.findPathTo(dropZone_X+15,dropZone_Y+15, obstacles);
+		
+		search.putdown();
+		Sound.beepSequenceUp();
+		Sound.beepSequence();
 		
 	}
 	

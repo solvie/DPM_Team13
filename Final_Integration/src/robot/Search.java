@@ -26,27 +26,38 @@ public class Search {
 	}
 	
 	public void searching(Point2D point1,Point2D point2,Point2D point3,int colornum,int flagnum){
-		odo.setPosition(new double [] {50, 95, 90}, new boolean [] {true,true,true});
+		odo.setPosition(new double [] {point1.getX()-15, point2.getY()-25, 90}, new boolean [] {true,true,true});
+		/**
+		 * check if the enemy zone is in the left or right side of robot, and set sensor rotate "deg" and robot "degrotate" based on that 
+		 */
 		boolean left=point1.getX()>odo.getX();
 		int deg=left ? 95 : -95;
 		int degrotate=deg>0 ? 90 : -90;
-		
+		/**
+		 * do search inside the enemy zone and move closer to the edge of zone until it goes beyond the edge-10cm 
+		 * "edge" means the line of top right point's y-axis
+		 */
 		while(odo.getX()<(point2.getX()-10)){
 			double x=odo.getX();
 			navigate.turnTo(90,true);
 			sensorMotor.rotate(-deg);
+			// do scan along the y-axis
 			boolean found=scan(point1,point3,-deg,-degrotate,colornum);
 			if(found)
 				break;
-			if(odo.getX()>point2.getX()-30)
+			// if the robot goes beyond edge-20cm, stop
+			if(odo.getX()>point2.getX()-20)
 				break;
+			// travel closer to the edge by 20cm every time
 			navigate.travelTo(x+20, odo.getY());
 			navigate.turnTo(90,true);
 			sensorMotor.rotate(deg);
+			// goes down to the bottom line-30cm, and detect the blocks if it's in the way
 			while(odo.getY()<(point2.getY()-30)){
 				navigate.setSpeeds(speed,speed);
 				Delay.msDelay(25);
 				if(detector.getrealdis()<4){
+					// if sees the target flag, capture it
 					if(detector.getcolornumber()!=1){
 						Sound.beep();grab();
 						navigate.travelBackwards(10);
@@ -56,15 +67,13 @@ public class Search {
 						// Pathfinder.findPathTo(point3.getX(),point3.getY());putdown();Pathfinder.findPathTo(x0,point1.getY()-10));
 						navigate.travelTo(x0,y0);
 					}
+					// if detects as not target, throw it away
 					else{
 						navigate.travelBackwards(10);
 						sensorMotor.rotate(-95);
 						arm.down();
 						navigate.travelForwards(12);
-//						arm.grab();
-//						navigate.turnTo(odo.getAng()-degrotate,true);
 						arm.throwaway();
-//						navigate.turnTo(degrotate,true);
 						sensorMotor.rotate(95);}
 				}
 			}
@@ -72,7 +81,10 @@ public class Search {
 		}
 		
 	}
-	
+	/**
+	 * scan method: go backwards along the y-axis to scan. if sensor sees a block, turn to facing block and go close to check it. 
+	 * the robot keeps scanning until it moves out the enemy zone
+	 */
 	public boolean scan(Point2D point1,Point2D point3,int deg,int degrotate,int colornum){
 		boolean found=false;
 		while(odo.getY()>point1.getY()-10){
@@ -82,6 +94,7 @@ public class Search {
 				navigate.travelForwards(2);
 				navigate.turnTo(odo.getAng()+degrotate,true);
 				sensorMotor.rotate(-deg);
+				// call check method to do the color detection
 				found=this.check(odo.getX(),odo.getY(),colornum);
 				if(found){
 					double x=odo.getX();
@@ -97,7 +110,12 @@ public class Search {
 		navigate.setSpeeds(0, 0);
 		return found;
 	}
-	
+	/**
+	 * check method: go close to check the color of block, if the block disappeared, move 3cm back along y-axis and scan again,
+	 * if it actually checked the block, move 12cm back along y-axis to avoid duplicated checking and continue scan   
+	 * @param x,y: the position where robot should go back after color detection 
+	 * @param colornum: the number of color of the target flag
+	 */
 	public boolean check(double x,double y,int colornum){
 		boolean found=false;
 		boolean checked=false;
@@ -117,6 +135,7 @@ public class Search {
 				sensorMotor.rotate(95);
 			}
 		}
+		// go back to point(x,y)
 		double dis=Math.sqrt(Math.pow(odo.getX()-x,2)+Math.pow(odo.getY()-y,2));
 		navigate.travelBackwards(dis);
 		navigate.turnTo(90,true);
@@ -126,28 +145,20 @@ public class Search {
 			navigate.travelBackwards(14);
 		return found;
 	}
-	
-	public boolean blockdetect(int r,int g,int b){
-		boolean lightblue=false;
-		if(g>b && g>r){
-			lightblue=true;
-			if(r<10 && g<10 && b<10)
-				lightblue=false;
-			if(r-b>10)
-				lightblue=false;
-		}
-		return lightblue;
-	}
-	
+	/**
+	 * method to capture the flag: move backwards a bit, put down the arm, and move forwards a bit, then lift arm up to capture flag
+	 */
 	public void grab(){
 		navigate.travelBackwards(10);
-		sensorMotor.rotate(-96);
+		sensorMotor.rotate(-95);
 		arm.down();
 		navigate.travelForwards(12);
 		arm.up();
-		sensorMotor.rotate(96);
+		sensorMotor.rotate(95);
 	}
-	
+	/**
+	 * 
+	 */
 	public void putdown(){
 		sensorMotor.rotate(-95);
 		arm.down();
