@@ -15,7 +15,7 @@ import lejos.robotics.geometry.Point2D;
  * Therefore, it does not  actually use ultrasonic data (that will be a different test) to detect blocks, but will be given new block
  * information at various intervals, from an outside class. 
  * 
- * @version 2.0
+ * @version 3.0
  * @author Solvie Lee
  * 
  */
@@ -391,52 +391,7 @@ public class Navigator {
 			this.rightMotor.forward();
 	}
 	
-	/**
-	 * Calculates the destination heading based on the current point coordinates and the destination point coordinates.
-	 * @param x X coordinates of destination
-	 * @param y Y coordinates of destination
-	 * @param currX current X coordinates (starting point)
-	 * @param currY current Y coordinates
-	 * @return a heading angle in degrees.
-	 */
-	public double getArcTan(double x, double y, double currX, double currY) {
-		double value, xdiff, ydiff;
-		xdiff = x - currX;
-		ydiff = y - currY;
-		if (ydiff > 0) {
-			if (xdiff > 0)
-				value = 90 - Math.toDegrees(Math.atan(ydiff / xdiff));
-			else
-				value = Math.toDegrees(Math.atan(Math.abs(ydiff / xdiff))) - 90;
-		} else {
-			if (xdiff > 0)
-				value = 90 + Math.toDegrees(Math.atan(Math.abs((ydiff / xdiff))));
-			else
-				value = -90 - Math.toDegrees(Math.atan(ydiff / xdiff));
-		}
-
-		return value;
-	}
-		
-	/**
-	 * Allows the robot to turn Clockwise.
-	 */
-	public void turnClockwise(){
-		leftMotor.setSpeed(SLOWER_ROTATE);
-		rightMotor.setSpeed(SLOWER_ROTATE);
-		leftMotor.forward();
-		rightMotor.backward();
-	}
 	
-	/**
-	 * Allows the robot to turn counter clockwise.
-	 */
-	public void turnCounterClockwise(){
-		leftMotor.setSpeed(SLOWER_ROTATE);
-		rightMotor.setSpeed(SLOWER_ROTATE);
-		leftMotor.backward();
-		rightMotor.forward();
-	}
 	
 	/**
 	 * Stops the motors

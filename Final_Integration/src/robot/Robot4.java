@@ -21,7 +21,7 @@ import lejos.robotics.geometry.Point2D;
  * 
  * This is the main robot class from which the program will be executed and all the operations will be called.
  * 
- * @version 2.0
+ * @version 4.0
  * @author Solvie Lee
  *
  */
@@ -40,11 +40,12 @@ public class Robot4 {
 	private static Localizer loca;
 	private static PathFinder pathFinder;
 	private static Search search;
-	private static Flagcapturer flagCapturer;
+	private static FlagCapturer flagCapturer;
 	private static Point2D[] obstacles, landmarks;
 	private static final int NUM_OBSTACLES = 20;
 	private static final String SERVER_IP = "192.168.43.6";
 	private static final int TEAM_NUMBER = 13;
+	private static final int GRID_SIZE = 8;
 	private static double homeZoneBL_X, homeZoneBL_Y, opponentHomeZoneBL_X, opponentHomeZoneBL_Y,opponentHomeZoneTR_X, opponentHomeZoneTR_Y,
 	dropZone_X, dropZone_Y;
 	private static int flagType, opponentFlagType;
@@ -71,12 +72,11 @@ public class Robot4 {
 		obDetector = new ObjectDetector(navi, usValue, usData, colorValue, colorData, colorValue2, colorData2, true);
 		loca = new Localizer(obDetector);
 		pathFinder = new PathFinder(obDetector);
-		flagCapturer = new Flagcapturer(armMotor);
+		flagCapturer = new FlagCapturer(armMotor);
 		search=new Search(obDetector,flagCapturer,sensorMotor);
 		obstacles = new Point2D[NUM_OBSTACLES];
 		
 	/*//-----------------------SET UP WIFI-------------------------//
-
 
 		//------------------------------------------------------------//*/
 		LCD.clear();
@@ -172,7 +172,7 @@ public class Robot4 {
 		if (t == null) {
 			LCD.drawString("Failed to read transmission", 0, 5);
 		} else {
-			t.coordinatesTransfo(8);
+			t.coordinatesTransfo(GRID_SIZE);
 			StartCorner corner = t.getStartingCorner();
 			homeZoneBL_X = t.homeZoneBL_X*30.48;
 			homeZoneBL_Y = t.homeZoneBL_Y*30.48;

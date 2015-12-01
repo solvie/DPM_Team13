@@ -90,6 +90,7 @@ public class Display implements TimerListener {
 	 */
 	public void displayNavigation(){ //Displays information
 		//TODO
+		LCD.drawString("Navigating", 0, 0);
 		
 	}
 	
@@ -97,6 +98,7 @@ public class Display implements TimerListener {
 	 * Displays whether there is an object in front of it and what color it is.
 	 */
 	public void displayBlockFinding(){ //Displays information
+		LCD.drawString("Search Sequence", 0, 0);
 		//TODO
 		
 	}

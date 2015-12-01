@@ -11,7 +11,7 @@ import lejos.utility.Delay;
  * This class performs the localization routine that will allow the robot to be aware of where in the
  * field it is, and provide the accurate initial information to the odometer. To be modified and filled in.
  * 
- * @version 1.0
+ * @version 2.0
  * @author Shawn Lu
  */
 public class Localizer {

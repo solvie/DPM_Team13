@@ -10,12 +10,12 @@ public class Search {
 	private static final int limit=35;
 	private static final int speed=180;
 	private EV3LargeRegulatedMotor sensorMotor;
-	private Flagcapturer arm;
+	private FlagCapturer arm;
 	private Odometer odo;
 	private Navigator navigate;
 	private ObjectDetector detector;
 	
-	public Search(ObjectDetector detector,Flagcapturer arm,EV3LargeRegulatedMotor sensorMotor){
+	public Search(ObjectDetector detector,FlagCapturer arm,EV3LargeRegulatedMotor sensorMotor){
 		
 		this.detector=detector;
 		this.navigate= detector.getNavi();
@@ -132,13 +132,13 @@ public class Search {
 		navigate.setSpeeds(0,0);
 		if(detector.getrealdis()<=4){
 			checked=true;
-			if(detector.getcolornumber()!=1){
+			if(detector.getcolornumber()== colornum){
 				Sound.beep();grab();found=true;}
 			else{
 				navigate.travelBackwards(10);
 				sensorMotor.rotate(-95);
 				arm.down();
-				navigate.travelForwards(12);
+				navigate.travelForwards(15);
 				arm.throwaway();
 				sensorMotor.rotate(95);
 			}
@@ -160,7 +160,7 @@ public class Search {
 		navigate.travelBackwards(10);
 		sensorMotor.rotate(-95);
 		arm.down();
-		navigate.travelForwards(12);
+		navigate.travelForwards(15);
 		arm.up();
 		sensorMotor.rotate(95);
 	}
