@@ -109,7 +109,7 @@ public class Navigator {
 				if(thereIsObject&& latch){
 					//to handle the angled object case.
 					double alreadyTravelledDist = Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2));
-					double newdistance = alreadyTravelledDist+ objectDist -2.5;
+					double newdistance = alreadyTravelledDist+ objectDist -5;
 					if (newdistance<distance){
 						distance = newdistance;
 						stopped = true;

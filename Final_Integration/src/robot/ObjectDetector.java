@@ -120,8 +120,9 @@ public class ObjectDetector implements TimerListener {
 	 */
 	public void updateNavi(double farDist, double closeishDist, double closeDist){
 		//notify navi if object 
-		if (realdistance <= farDist)
+		if (realdistance <= farDist){
 			objectDetected = true;
+		}
 		else
 			objectDetected = false;
 		//notify navi if object closeish 
@@ -137,7 +138,7 @@ public class ObjectDetector implements TimerListener {
 		
 		navi.setDetectionInfo(new boolean[]{objectDetected, objectCloseish, objectClose, false},new boolean[]{true, true, true, false});
 		//navi.setObjectDist(realdistance);
-		navi.setObjectDist(OBJECT_FAR-5);
+		navi.setObjectDist(realdistance);
 	}
 	
 	/**

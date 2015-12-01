@@ -65,8 +65,6 @@ public class Robot4 {
 		SensorModes colorSensor2 = new EV3ColorSensor(colorPort2);
 		SampleProvider colorValue2 = colorSensor2.getMode("ColorID");//TODO: change mode?
 		float[] colorData2 = new float[colorValue2.sampleSize()];
-	
-
 		
 		odo = new Odometer(leftMotor, rightMotor);
 		navi = new Navigator(odo, sensorMotor);
@@ -77,70 +75,16 @@ public class Robot4 {
 		search=new Search(obDetector,flagCapturer,sensorMotor);
 		obstacles = new Point2D[NUM_OBSTACLES];
 		
-		
-		
-		
 	/*//-----------------------SET UP WIFI-------------------------//
-		WifiConnection conn = null;
-		try {
-			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
-		} catch (IOException e) {
-			LCD.drawString("Connection failed", 0, 8);
-		}
-		
-		// example usage of Transmission class
-		Transmission t = conn.getTransmission();
-		if (t == null) {
-			LCD.drawString("Failed to read transmission", 0, 5);
-		} else {
-			t.coordinatesTransfo(8);
-			StartCorner corner = t.getStartingCorner();
-			homeZoneBL_X = t.homeZoneBL_X*30.48;
-			homeZoneBL_Y = t.homeZoneBL_Y*30.48;
-			opponentHomeZoneBL_X = t.opponentHomeZoneBL_X*30.48;
-			opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y*30.48;
-			opponentHomeZoneTR_X = t.opponentHomeZoneTR_X*30.48;
-			opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y*30.48;
-			dropZone_X = t.dropZone_X*30.48;
-			dropZone_Y = t.dropZone_Y*30.48;
-			flagType = t.flagType;
-			opponentFlagType = t.opponentFlagType;
-			
-			// print out the transmission information
-			conn.printTransmission();
-		}
-		// stall until user decides to end program
-		//Button.ESCAPE.waitForPress(); 
+
 
 		//------------------------------------------------------------//*/
 		LCD.clear();
 		display = new Display();
 		display.setPart(0);
 		
-		/*
-		int option = 0;
-		while (option == 0)
-			option = Button.waitForAnyPress(); // ID Right executes
-		
-		switch (option) {
-		case Button.ID_RIGHT:
-			execute();
-			break;
-		default:
-			System.out.println("Error - invalid button");
-			System.exit(-1);
-			break;
-		}
-		*/
-		
-		opponentHomeZoneBL_X = 30.48*4;
-		opponentHomeZoneBL_Y = 30.48*4;
-		opponentHomeZoneTR_X = 30.48*6;
-		opponentHomeZoneTR_Y = 30.48*6;
-		dropZone_X = 30.48*2;
-		dropZone_Y = 30.48*2;
-		
-		opponentFlagType = 2;
+		//setUpWifi();
+		test();
 		
 		execute();
 	}
@@ -213,6 +157,66 @@ public class Robot4 {
 		Sound.beepSequenceUp();
 		Sound.beepSequence();
 		
+	}
+	
+	public static void setUpWifi(){
+		WifiConnection conn = null;
+		try {
+			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+		} catch (IOException e) {
+			LCD.drawString("Connection failed", 0, 8);
+		}
+		
+		// example usage of Transmission class
+		Transmission t = conn.getTransmission();
+		if (t == null) {
+			LCD.drawString("Failed to read transmission", 0, 5);
+		} else {
+			t.coordinatesTransfo(8);
+			StartCorner corner = t.getStartingCorner();
+			homeZoneBL_X = t.homeZoneBL_X*30.48;
+			homeZoneBL_Y = t.homeZoneBL_Y*30.48;
+			opponentHomeZoneBL_X = t.opponentHomeZoneBL_X*30.48;
+			opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y*30.48;
+			opponentHomeZoneTR_X = t.opponentHomeZoneTR_X*30.48;
+			opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y*30.48;
+			dropZone_X = t.dropZone_X*30.48;
+			dropZone_Y = t.dropZone_Y*30.48;
+			flagType = t.flagType;
+			opponentFlagType = t.opponentFlagType;
+			
+			// print out the transmission information
+			conn.printTransmission();
+		}
+		// stall until user decides to end program
+		//Button.ESCAPE.waitForPress(); 
+	}
+	
+	public static void test(){
+		/*
+		int option = 0;
+		while (option == 0)
+			option = Button.waitForAnyPress(); // ID Right executes
+		
+		switch (option) {
+		case Button.ID_RIGHT:
+			execute();
+			break;
+		default:
+			System.out.println("Error - invalid button");
+			System.exit(-1);
+			break;
+		}
+		*/
+		
+		opponentHomeZoneBL_X = 30.48*3;
+		opponentHomeZoneBL_Y = 30.48*3;
+		opponentHomeZoneTR_X = 30.48*5;
+		opponentHomeZoneTR_Y = 30.48*5;
+		dropZone_X = 30.48*2;
+		dropZone_Y = 30.48*2;
+		
+		opponentFlagType = 2;
 	}
 	
 }
