@@ -9,7 +9,7 @@ import lejos.hardware.Sound;
  * coordinates that should represent a continuous line.
  * 
  * @version 3.0
- * @author chouttle
+ * @author Vivien Traineau
  */
 public class OdometerCorrection {
 	private Odometer odo;

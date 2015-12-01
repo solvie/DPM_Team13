@@ -25,7 +25,7 @@ import lejos.robotics.geometry.Point2D;
  * @author Solvie Lee
  *
  */
-public class Robot4 {
+public class Robot4_1 {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
@@ -80,7 +80,7 @@ public class Robot4 {
 
 		//------------------------------------------------------------//*/
 		LCD.clear();
-		display = new Display();
+		display = new Display(obDetector);
 		display.setPart(0);
 		
 		//setUpWifi();
@@ -133,7 +133,7 @@ public class Robot4 {
 	public static void findFlag(){
 		display.setPart(3);
 		// search enemy zone for the flag
-		navi.travelTo(opponentHomeZoneBL_X-15, opponentHomeZoneTR_Y-15);
+		navi.travelTo(opponentHomeZoneBL_X-15, opponentHomeZoneTR_Y-25);
 		
 		Point2D point1=new Point2D.Double(opponentHomeZoneBL_X,opponentHomeZoneBL_Y);
 		Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);
@@ -209,11 +209,11 @@ public class Robot4 {
 		}
 		*/
 		
-		opponentHomeZoneBL_X = 30.48*3;
-		opponentHomeZoneBL_Y = 30.48*3;
-		opponentHomeZoneTR_X = 30.48*5;
-		opponentHomeZoneTR_Y = 30.48*5;
-		dropZone_X = 30.48*2;
+		opponentHomeZoneBL_X = 30.48*1;
+		opponentHomeZoneBL_Y = 30.48*1;
+		opponentHomeZoneTR_X = 30.48*2;
+		opponentHomeZoneTR_Y = 30.48*2;
+		dropZone_X = 30.48*3;
 		dropZone_Y = 30.48*2;
 		
 		opponentFlagType = 2;

@@ -11,8 +11,8 @@ import lejos.utility.Timer;
  * The object detector class is responsible for using the ultrasonic sensor and the light sensor to detect
  * objects in front of the robot. 
  * 
- * @version 1.0
- * @author Solvie Lee, Shawn Lu
+ * @version 2.0
+ * @author Shawn Lu, Solvie Lee
  *
  */
 
