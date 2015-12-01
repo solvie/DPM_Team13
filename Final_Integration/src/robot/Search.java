@@ -7,8 +7,8 @@ import lejos.utility.Delay;
 
 
 public class Search {
-	private static final int limit=32;
-	private static final int speed=150;
+	private static final int limit=35;
+	private static final int speed=180;
 	private EV3LargeRegulatedMotor sensorMotor;
 	private Flagcapturer arm;
 	private Odometer odo;
@@ -25,6 +25,14 @@ public class Search {
 		sensorMotor.setAcceleration(600);
 	}
 	
+	/**
+	 * main searching method
+	 * @param point1: the bottom left point of the enemy zone
+	 * @param point2: the top right point of the enemy zone
+	 * @param point3: the point of the home zone
+	 * @param colornum: the number of color of the target flag
+	 * @param flagnum: the amount of target flag
+	 */
 	public void searching(Point2D point1,Point2D point2,Point2D point3,int colornum,int flagnum){
 		odo.setPosition(new double [] {point1.getX()-15, point2.getY()-25, 90}, new boolean [] {true,true,true});
 		/**
@@ -60,7 +68,7 @@ public class Search {
 					// if sees the target flag, capture it
 					if(detector.getcolornumber()!=1){
 						Sound.beep();grab();
-						navigate.travelBackwards2(10);
+						navigate.travelBackwards(10);
 						double x0=odo.getX();
 						double y0=odo.getY();
 						navigate.travelTo(x0,point1.getY()-10);
@@ -69,10 +77,10 @@ public class Search {
 					}
 					// if detects as not target, throw it away
 					else{
-						navigate.travelBackwards2(10);
+						navigate.travelBackwards(10);
 						sensorMotor.rotate(-95);
 						arm.down();
-						navigate.travelForwards2(12);
+						navigate.travelForwards(12);
 						arm.throwaway();
 						sensorMotor.rotate(95);}
 				}
@@ -91,7 +99,7 @@ public class Search {
 			navigate.setSpeeds(-speed,-speed);
 			Delay.msDelay(25);
 			if(detector.getrealdis()<limit){
-				navigate.travelForwards2(2);
+				navigate.travelForwards(2);
 				navigate.turnTo(odo.getAng()+degrotate,true);
 				sensorMotor.rotate(-deg);
 				// call check method to do the color detection
@@ -127,32 +135,32 @@ public class Search {
 			if(detector.getcolornumber()!=1){
 				Sound.beep();grab();found=true;}
 			else{
-				navigate.travelBackwards2(10);
+				navigate.travelBackwards(10);
 				sensorMotor.rotate(-95);
 				arm.down();
-				navigate.travelForwards2(12);
+				navigate.travelForwards(12);
 				arm.throwaway();
 				sensorMotor.rotate(95);
 			}
 		}
 		// go back to point(x,y)
 		double dis=Math.sqrt(Math.pow(odo.getX()-x,2)+Math.pow(odo.getY()-y,2));
-		navigate.travelBackwards2(dis);
+		navigate.travelBackwards(dis);
 		navigate.turnTo(90,true);
 		if(!checked)
-			navigate.travelBackwards2(5);
+			navigate.travelBackwards(5);
 		else
-			navigate.travelBackwards2(14);
+			navigate.travelBackwards(14);
 		return found;
 	}
 	/**
 	 * method to capture the flag: move backwards a bit, put down the arm, and move forwards a bit, then lift arm up to capture flag
 	 */
 	public void grab(){
-		navigate.travelBackwards2(10);
+		navigate.travelBackwards(10);
 		sensorMotor.rotate(-95);
 		arm.down();
-		navigate.travelForwards2(12);
+		navigate.travelForwards(12);
 		arm.up();
 		sensorMotor.rotate(95);
 	}
@@ -162,7 +170,7 @@ public class Search {
 	public void putdown(){
 		sensorMotor.rotate(-95);
 		arm.down();
-		navigate.travelBackwards2(10);
+		navigate.travelBackwards(10);
 		arm.up();
 		sensorMotor.rotate(95);
 	}
