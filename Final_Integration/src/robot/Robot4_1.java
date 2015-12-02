@@ -139,7 +139,7 @@ public class Robot4_1 {
 		Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);
 		Point2D point3=new Point2D.Double(0,0);
 		
-		search.searching(point1, point2, point3, opponentFlagType, 3);
+		search.searching(point1, point2, point3, opponentFlagType,1);
 	}
 	
 	
@@ -208,15 +208,26 @@ public class Robot4_1 {
 			break;
 		}
 		*/
+			opponentHomeZoneBL_X = 30.48*1;
+			opponentHomeZoneBL_Y = 30.48*1;
+			opponentHomeZoneTR_X = 30.48*3;
+			opponentHomeZoneTR_Y = 30.48*3;
+			dropZone_X = 30.48*0;
+			dropZone_Y = 30.48*0;
+			opponentFlagType = 5;
+//			Point2D point1=new Point2D.Double(opponentHomeZoneBL_X,opponentHomeZoneBL_Y);
+//			Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);
+//			Point2D point3=new Point2D.Double(0,0);
+//			search.searching(point1, point2, point3,5,1);
+			
+//			flagCapturer.down();
+//			navi.travelForwards2(3);
+//			flagCapturer.throwaway();
+//			navi.travelForwards2(3);
+//			flagCapturer.down();
+//			navi.travelForwards2(3);
+//			flagCapturer.up();
 		
-		opponentHomeZoneBL_X = 30.48*1;
-		opponentHomeZoneBL_Y = 30.48*1;
-		opponentHomeZoneTR_X = 30.48*2;
-		opponentHomeZoneTR_Y = 30.48*2;
-		dropZone_X = 30.48*3;
-		dropZone_Y = 30.48*2;
-		
-		opponentFlagType = 2;
 	}
 	
 }

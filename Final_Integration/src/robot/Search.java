@@ -1,5 +1,4 @@
 package robot;
-import java.util.ArrayList;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.geometry.Point2D;
@@ -66,7 +65,7 @@ public class Search {
 			navigate.turnTo(90,true);
 			sensorMotor.rotate(deg);
 			// goes down to the bottom line-30cm, and detect the blocks if it's in the way
-			while(odo.getY()<(point2.getY()-30)){
+			while(odo.getY()<(point2.getY()-28)){
 				navigate.setSpeeds(speed,speed);
 				Delay.msDelay(25);
 				if(detector.getrealdis()<4){
@@ -104,10 +103,10 @@ public class Search {
 			navigate.setSpeeds(-speed,-speed);
 			Delay.msDelay(25);
 			if(detector.getrealdis()<limit){
-				navigate.travelForwards2(2);
+				navigate.travelForwards2(3);
 				navigate.turnTo(odo.getAng()+degrotate,true);
 				sensorMotor.rotate(-deg);
-				// call check method to do the color detection
+				// call the check method to do the color detection
 				found=this.check(odo.getX(),odo.getY(),colornum);
 				if(found){
 					double x=odo.getX();
@@ -153,9 +152,9 @@ public class Search {
 		navigate.travelBackwards2(dis);
 		navigate.turnTo(90,true);
 		if(!checked)
-			navigate.travelBackwards2(5);
+			navigate.travelBackwards2(6);
 		else
-			navigate.travelBackwards2(14);
+			navigate.travelBackwards2(15);
 		return found;
 	}
 	/**
