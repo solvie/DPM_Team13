@@ -109,7 +109,7 @@ public class Search {
 			navigate.setSpeeds(-speed,-speed);
 			Delay.msDelay(25);
 			if(detector.getrealdis()<limit){
-				navigate.travelForwards2(3);
+				navigate.travelForwards2(2);
 				navigate.turnTo(odo.getAng()+degrotate,true);
 				sensorMotor.rotate(-deg);
 				// call the check method to do the color detection
@@ -160,9 +160,9 @@ public class Search {
 		navigate.travelBackwards2(dis);
 		navigate.turnTo(90,true);
 		if(!checked)
-			navigate.travelBackwards2(7);
+			navigate.travelBackwards2(6);
 		else
-			navigate.travelBackwards2(15);
+			navigate.travelBackwards2(14);
 		return found;
 	}
 	/**
