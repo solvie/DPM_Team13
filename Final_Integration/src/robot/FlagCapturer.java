@@ -46,14 +46,14 @@ public class FlagCapturer {
 	
 	public synchronized void throwaway(){
 		arm.setSpeed(300);
-		arm.setAcceleration(2000);
+		arm.setAcceleration(3000);
 		
 //		arm.rotate(-180,true);
 //		while(!arm.isStalled()){
 //			arm.rotate(-8,true);}
 //		arm.rotate(15,true);
 		
-		arm.rotateTo(-180);
+		arm.rotateTo(-190);
 		arm.flt(true);
 	}
 	

@@ -107,9 +107,9 @@ public class Navigator {
 				leftMotor.forward();
 				rightMotor.forward();
 				if(thereIsObject&& latch){
-					//to handle the angled object case.
+					//to handle the disappearing object case.
 					double alreadyTravelledDist = Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2));
-					double newdistance = alreadyTravelledDist+ objectDist -5;
+					double newdistance = alreadyTravelledDist+ objectDist -10;
 					if (newdistance<distance){
 						distance = newdistance;
 						stopped = true;

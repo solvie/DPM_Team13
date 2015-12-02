@@ -43,9 +43,9 @@ public class Robot4_1 {
 	private static FlagCapturer flagCapturer;
 	private static Point2D[] obstacles, landmarks;
 	private static final int NUM_OBSTACLES = 20;
-	private static final String SERVER_IP = "192.168.43.6";
+	private static final String SERVER_IP = "192.168.43.135";
 	private static final int TEAM_NUMBER = 13;
-	private static final int GRID_SIZE = 8;
+	private static final int GRID_SIZE = 12;
 	private static double homeZoneBL_X, homeZoneBL_Y, opponentHomeZoneBL_X, opponentHomeZoneBL_Y,opponentHomeZoneTR_X, opponentHomeZoneTR_Y,
 	dropZone_X, dropZone_Y;
 	private static int flagType, opponentFlagType;
@@ -99,8 +99,8 @@ public class Robot4_1 {
 		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
 		localize();
 		findEnemyBase();
-		findFlag();
-		returnHomeBase();
+		//findFlag();
+		//returnHomeBase();
 		//execute the rest of the program.
 	}
 	
@@ -151,7 +151,9 @@ public class Robot4_1 {
 		//return the flag to the destination
 		double x=0, y=0;
 		//TODO set x and y to the coordinates of the home base
-		pathFinder.findPathTo(dropZone_X+15,dropZone_Y+15, obstacles);
+		pathFinder.findPathTo(dropZone_X,dropZone_Y, obstacles);
+		
+		navi.turnTo(45, true);
 		
 		search.putdown();
 		Sound.beepSequenceUp();
@@ -208,12 +210,12 @@ public class Robot4_1 {
 			break;
 		}
 		*/
-			opponentHomeZoneBL_X = 30.48*1;
-			opponentHomeZoneBL_Y = 30.48*1;
-			opponentHomeZoneTR_X = 30.48*3;
-			opponentHomeZoneTR_Y = 30.48*3;
-			dropZone_X = 30.48*0;
-			dropZone_Y = 30.48*0;
+			opponentHomeZoneBL_X = 30.48*6;
+			opponentHomeZoneBL_Y = 30.48*6;
+			opponentHomeZoneTR_X = 30.48*8;
+			opponentHomeZoneTR_Y = 30.48*8;
+			dropZone_X = 30.48*3;
+			dropZone_Y = 30.48*3;
 			opponentFlagType = 5;
 //			Point2D point1=new Point2D.Double(opponentHomeZoneBL_X,opponentHomeZoneBL_Y);
 //			Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);

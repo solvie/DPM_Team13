@@ -55,8 +55,7 @@ public class Search {
 			sensorMotor.rotate(-deg);
 			// do scan along the y-axis
 			boolean found=scan(point1,point3,-deg,-degrotate,colornum);
-			if(found)
-				break;
+			if(found){break;}
 			// if the robot goes beyond edge-20cm, stop
 			if(odo.getX()>point2.getX()-20)
 				break;
@@ -72,12 +71,11 @@ public class Search {
 					// if sees the target flag, capture it
 					if(detector.getcolornumber()==colornum){
 						Sound.beep();grab();
+						found=true;
 						navigate.travelBackwards2(10);
 						double x0=odo.getX();
-						double y0=odo.getY();
 						navigate.travelTo(x0,point1.getY()-10);
-						// Pathfinder.findPathTo(point3.getX(),point3.getY());putdown();Pathfinder.findPathTo(x0,point1.getY()-10));
-						navigate.travelTo(x0,y0);
+						break;
 					}
 					// if detects as not target, throw it away
 					else{
@@ -89,6 +87,7 @@ public class Search {
 						sensorMotor.rotate(95);}
 				}
 			}
+			if(found){break;}
 			navigate.travelTo(x+20,point2.getY()-25);
 		}
 		
@@ -109,11 +108,7 @@ public class Search {
 				// call the check method to do the color detection
 				found=this.check(odo.getX(),odo.getY(),colornum);
 				if(found){
-					double x=odo.getX();
-					double y=odo.getY();
 					navigate.travelTo(odo.getX(),point1.getY()-10);
-					// Pathfinder.findPathTo(point3.getX(),point3.getY());putdown();Pathfinder.findPathTo(x,y);
-//					navigate.travelTo(x,y);
 					break;
 				}
 				sensorMotor.rotate(deg);

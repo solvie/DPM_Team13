@@ -11,7 +11,7 @@ import lejos.utility.Timer;
  * The object detector class is responsible for using the ultrasonic sensor and the light sensor to detect
  * objects in front of the robot. 
  * 
- * @version 2.0
+ * @version 2.5
  * @author Shawn Lu, Solvie Lee
  *
  */
@@ -19,7 +19,7 @@ import lejos.utility.Timer;
 public class ObjectDetector implements TimerListener {
 	
 	public static final int errorMargin = 2, DEFAULT_INTERVAL = 25, offFactor = 20;
-	private static final int OBJECT_FAR = 50, OBJECT_CLOSE = 5, OBJECT_CLOSEISH = 15, MAX_RANGE = 120;
+	private static final int OBJECT_FAR = 60, OBJECT_CLOSE = 5, OBJECT_CLOSEISH = 15, MAX_RANGE = 120;
 	private boolean objectDetected, objectCloseish, objectClose, objectColorSeen, flagDetected;
 	private SampleProvider usValue, colorSensor, colorSensor2;
 	private int  distance, realdistance, lastcolor2, deltacolor2, filter, filter_out = 10;
