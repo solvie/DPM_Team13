@@ -43,7 +43,7 @@ public class Search {
 		 * check if the enemy zone is in the left or right side of robot, and set sensor rotate "deg" and robot "degrotate" based on that 
 		 */
 		boolean left=point1.getX()>odo.getX();
-		int deg=left ? 92 : -92;
+		int deg=left ? 90 : -90;
 		int degrotate=deg>0 ? 90 : -90;
 		/**
 		 * do search inside the enemy zone and move closer to the edge of zone until it goes beyond the edge-10cm 
@@ -109,7 +109,8 @@ public class Search {
 			navigate.setSpeeds(-speed,-speed);
 			Delay.msDelay(25);
 			if(detector.getrealdis()<limit){
-				navigate.travelForwards2(2);
+				navigate.setSpeeds(0,0);
+				navigate.travelBackwards2(2);
 				navigate.turnTo(odo.getAng()+degrotate,true);
 				sensorMotor.rotate(-deg);
 				// call the check method to do the color detection
@@ -160,9 +161,9 @@ public class Search {
 		navigate.travelBackwards2(dis);
 		navigate.turnTo(90,true);
 		if(!checked)
-			navigate.travelBackwards2(6);
+			navigate.travelBackwards2(2);
 		else
-			navigate.travelBackwards2(14);
+			navigate.travelBackwards2(9);
 		return found;
 	}
 	/**

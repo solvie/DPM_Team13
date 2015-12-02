@@ -80,8 +80,8 @@ public class Robot_5 {
 		display = new Display(obDetector);
 		display.setPart(0);
 		
-		setUpWifi();
-		//test();
+		//setUpWifi();
+		test();
 		
 		execute();
 	}
@@ -208,9 +208,9 @@ public class Robot_5 {
 		}
 		*/
 			opponentHomeZoneBL_X = 30.48*2;
-			opponentHomeZoneBL_Y = 30.48*2;
+			opponentHomeZoneBL_Y = 30.48*3;
 			opponentHomeZoneTR_X = 30.48*4;
-			opponentHomeZoneTR_Y = 30.48*4;
+			opponentHomeZoneTR_Y = 30.48*5;
 			dropZone_X = 30.48*6;
 			dropZone_Y = 30.48*6;
 			opponentFlagType = 5;

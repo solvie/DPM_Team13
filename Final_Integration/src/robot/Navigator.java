@@ -94,13 +94,13 @@ public class Navigator {
 		//---
 		if (left){
 			sensorMotor.setAcceleration(600);
-			sensorMotor.rotate(20);
-			sensorMotor.rotate(-20);
+			sensorMotor.rotate(13);
+			sensorMotor.rotate(-13);
 		}
 		else{
 			sensorMotor.setAcceleration(600);
-			sensorMotor.rotate(-20);
-			sensorMotor.rotate(20);
+			sensorMotor.rotate(-13);
+			sensorMotor.rotate(13);
 		}
 		
 		//-----
@@ -123,7 +123,7 @@ public class Navigator {
 				if(thereIsObject&& latch){
 					//to handle the disappearing object case.
 					double alreadyTravelledDist = Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2));
-					double newdistance = alreadyTravelledDist+ objectDist -12;
+					double newdistance = alreadyTravelledDist+ objectDist -8;
 					if (newdistance<distance){
 						distance = newdistance;
 						stopped = true;
