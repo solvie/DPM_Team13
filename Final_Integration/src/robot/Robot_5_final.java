@@ -25,7 +25,7 @@ import lejos.robotics.geometry.Point2D;
  * @author Solvie Lee
  *
  */
-public class Robot_5 {
+public class Robot_5_final {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
@@ -43,7 +43,7 @@ public class Robot_5 {
 	private static FlagCapturer flagCapturer;
 	private static Point2D[] obstacles, landmarks;
 	private static final int NUM_OBSTACLES = 20;
-	private static final String SERVER_IP = "192.168.43.135";
+	private static final String SERVER_IP = "192.168.10.200";
 	private static final int TEAM_NUMBER = 13;
 	private static final int GRID_SIZE = 12;
 	private static double homeZoneBL_X, homeZoneBL_Y, opponentHomeZoneBL_X, opponentHomeZoneBL_Y,opponentHomeZoneTR_X, opponentHomeZoneTR_Y,
@@ -80,8 +80,8 @@ public class Robot_5 {
 		display = new Display(obDetector);
 		display.setPart(0);
 		
-		//setUpWifi();
-		test();
+		setUpWifi();
+		//test();
 		
 		execute();
 	}
