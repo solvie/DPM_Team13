@@ -25,7 +25,7 @@ import lejos.robotics.geometry.Point2D;
  * @author Solvie Lee
  *
  */
-public class Robot4_1 {
+public class Robot_5 {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
@@ -76,15 +76,12 @@ public class Robot4_1 {
 		search=new Search(obDetector,flagCapturer,sensorMotor);
 		obstacles = new Point2D[NUM_OBSTACLES];
 		
-	/*//-----------------------SET UP WIFI-------------------------//
-
-		//------------------------------------------------------------//*/
 		LCD.clear();
 		display = new Display(obDetector);
 		display.setPart(0);
 		
-		//setUpWifi();
-		test();
+		setUpWifi();
+		//test();
 		
 		execute();
 	}
@@ -99,8 +96,8 @@ public class Robot4_1 {
 		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
 		localize();
 		findEnemyBase();
-		//findFlag();
-		//returnHomeBase();
+		findFlag();
+		returnHomeBase();
 		//execute the rest of the program.
 	}
 	
@@ -139,7 +136,7 @@ public class Robot4_1 {
 		Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);
 		Point2D point3=new Point2D.Double(0,0);
 		
-		search.searching(point1, point2, point3, opponentFlagType,1);
+		search.searching(point1, point2, point3, opponentFlagType);
 	}
 	
 	
@@ -210,12 +207,12 @@ public class Robot4_1 {
 			break;
 		}
 		*/
-			opponentHomeZoneBL_X = 30.48*6;
-			opponentHomeZoneBL_Y = 30.48*6;
-			opponentHomeZoneTR_X = 30.48*8;
-			opponentHomeZoneTR_Y = 30.48*8;
-			dropZone_X = 30.48*3;
-			dropZone_Y = 30.48*3;
+			opponentHomeZoneBL_X = 30.48*2;
+			opponentHomeZoneBL_Y = 30.48*2;
+			opponentHomeZoneTR_X = 30.48*4;
+			opponentHomeZoneTR_Y = 30.48*4;
+			dropZone_X = 30.48*6;
+			dropZone_Y = 30.48*6;
 			opponentFlagType = 5;
 //			Point2D point1=new Point2D.Double(opponentHomeZoneBL_X,opponentHomeZoneBL_Y);
 //			Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);

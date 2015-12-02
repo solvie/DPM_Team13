@@ -84,12 +84,26 @@ public class Navigator {
 	public boolean [] travelToWithAvoidance(double x, double y){
 		double currX, currY, trajTheta, distance;
 		boolean[] result= new boolean[2];
-
+		boolean left;
 		// calculate the amount of theta to turn, and turn by that amount
 		currX = odo.getX();
 		currY = odo.getY();
 		trajTheta = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
-		turnTo(trajTheta, true);
+		left = turnTo(trajTheta, true);
+		
+		//---
+		if (left){
+			sensorMotor.setAcceleration(600);
+			sensorMotor.rotate(20);
+			sensorMotor.rotate(-20);
+		}
+		else{
+			sensorMotor.setAcceleration(600);
+			sensorMotor.rotate(-20);
+			sensorMotor.rotate(20);
+		}
+		
+		//-----
 		
 		if (thereIsObjectWithinD) { //if there is an object right at the start.
 			result[0] = true; // object at start
@@ -109,7 +123,7 @@ public class Navigator {
 				if(thereIsObject&& latch){
 					//to handle the disappearing object case.
 					double alreadyTravelledDist = Math.sqrt(Math.pow(odo.getX() - currX, 2) + Math.pow(odo.getY() - currY, 2));
-					double newdistance = alreadyTravelledDist+ objectDist -10;
+					double newdistance = alreadyTravelledDist+ objectDist -12;
 					if (newdistance<distance){
 						distance = newdistance;
 						stopped = true;
@@ -242,9 +256,10 @@ public class Navigator {
 	 * @param theta heading to turn to
 	 * @param stop whether motors should stop
 	 */
-	public void turnTo(double theta, boolean stop) {
+	public boolean turnTo(double theta, boolean stop) { //true if left
 		double error = normalize(theta) - odo.getAng(), abserror;
 		boolean turn = false;
+		boolean left = false;
 		if (Math.abs(error)>DEG_ERR)
 			turn = true;
 		
@@ -254,18 +269,22 @@ public class Navigator {
 			
 			if (error < -180.0) {
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
+				left= true;
 				if (abserror < DEG_ERR)
 					break;
 			} else if (error < 0.0) {
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
+				left = false;
 				if (abserror < DEG_ERR)
 					break;
 			} else if (error > 180.0) {
 				this.setSpeeds(HALF_SPEED, -HALF_SPEED);
+				left= false;
 				if (abserror < DEG_ERR)
 					break;
 			} else {
 				this.setSpeeds(-HALF_SPEED, HALF_SPEED);
+				left= true;
 				if (abserror < DEG_ERR)
 					break;
 			}
@@ -274,6 +293,8 @@ public class Navigator {
 		if (stop) {
 			this.setSpeeds(0, 0);
 		}
+		
+		return left;
 
 	}
 	

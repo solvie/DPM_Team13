@@ -16,45 +16,43 @@ public class FlagCapturer {
 	}
 	
 	public synchronized void up(){
-		arm.setSpeed(100);
-		arm.setAcceleration(100);
+//		arm.setSpeed(100);
+		arm.setAcceleration(200);
 		
-//		arm.rotate(-165,false);
+//		arm.rotate(-145,false);
 //		while(!arm.isStalled()){
 //			arm.rotate(-3,true);}
 //		arm.rotate(15,false);
 		
-		arm.rotateTo(-150);
+		arm.rotateTo(-160);
 	}
 	
 	public synchronized void down(){
-		arm.setSpeed(100);
-		arm.setAcceleration(150);
+//		arm.setSpeed(100);
+		arm.setAcceleration(250);
 		
 //		arm.rotate(170,false);
-//		arm.flt();
-//		/*
-//		 * 
-//		 *while(!arm.isStalled()){
-//		 *arm.rotate(2,false);}
-//		 *arm.rotate(-25,false);
-//		 */
+//		arm.flt(true);
+		
+//		while(!arm.isStalled()){
+//			arm.rotate(8,true);}
+//		arm.rotate(-15,true);
 		
 		arm.rotateTo(190);
 		arm.flt(true);
 	}
 	
 	public synchronized void throwaway(){
-		arm.setSpeed(300);
-		arm.setAcceleration(3000);
+//		arm.setSpeed(1600);
+		arm.setAcceleration(1200);
 		
 //		arm.rotate(-180,true);
 //		while(!arm.isStalled()){
-//			arm.rotate(-8,true);}
+//			arm.rotate(-10,true);}
 //		arm.rotate(15,true);
 		
-		arm.rotateTo(-190);
-		arm.flt(true);
+		arm.rotateTo(-180);
+		
 	}
 	
 }

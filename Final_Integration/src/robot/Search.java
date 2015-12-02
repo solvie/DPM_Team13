@@ -37,13 +37,13 @@ public class Search {
 	 * @param colornum: the number of color of the target flag
 	 * @param flagnum: the amount of target flag
 	 */
-	public void searching(Point2D point1,Point2D point2,Point2D point3,int colornum,int flagnum){
+	public void searching(Point2D point1,Point2D point2,Point2D point3,int colornum){
 		odo.setPosition(new double [] {point1.getX()-15, point2.getY()-25, 90}, new boolean [] {true,true,true});
 		/**
 		 * check if the enemy zone is in the left or right side of robot, and set sensor rotate "deg" and robot "degrotate" based on that 
 		 */
 		boolean left=point1.getX()>odo.getX();
-		int deg=left ? 95 : -95;
+		int deg=left ? 92 : -92;
 		int degrotate=deg>0 ? 90 : -90;
 		/**
 		 * do search inside the enemy zone and move closer to the edge of zone until it goes beyond the edge-10cm 
@@ -82,9 +82,16 @@ public class Search {
 						navigate.travelBackwards2(10);
 						sensorMotor.rotate(-95);
 						arm.down();
-						navigate.travelForwards2(12);
+						navigate.travelForwards2(13);
+						arm.up();
+						navigate.turnTo(180,true);
+						arm.down();
+						navigate.travelForwards2(10);
+						navigate.travelBackwards2(10);
 						arm.throwaway();
-						sensorMotor.rotate(95);}
+						sensorMotor.rotate(95);
+						navigate.turnTo(90,true);
+					}
 				}
 			}
 			if(found){break;}
@@ -131,15 +138,21 @@ public class Search {
 		navigate.setSpeeds(0,0);
 		if(detector.getrealdis()<=4){
 			checked=true;
-			if(detector.getcolornumber()== colornum){
+			if(detector.getcolornumber()==colornum){
 				Sound.beep();grab();found=true;}
 			else{
 				navigate.travelBackwards2(10);
 				sensorMotor.rotate(-95);
 				arm.down();
 				navigate.travelForwards2(15);
+				arm.up();
+				navigate.turnTo(180,true);
+				arm.down();
+				navigate.travelForwards2(10);
+				navigate.travelBackwards2(10);
 				arm.throwaway();
 				sensorMotor.rotate(95);
+				navigate.turnTo(0,true);
 			}
 		}
 		// go back to point(x,y)
@@ -147,7 +160,7 @@ public class Search {
 		navigate.travelBackwards2(dis);
 		navigate.turnTo(90,true);
 		if(!checked)
-			navigate.travelBackwards2(6);
+			navigate.travelBackwards2(7);
 		else
 			navigate.travelBackwards2(15);
 		return found;
@@ -169,8 +182,9 @@ public class Search {
 	public void putdown(){
 		sensorMotor.rotate(-95);
 		arm.down();
+		navigate.travelForwards2(10);
 		navigate.travelBackwards2(10);
-		arm.up();
+		arm.throwaway();
 		sensorMotor.rotate(95);
 	}
 }
