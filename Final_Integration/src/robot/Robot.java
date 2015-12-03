@@ -17,15 +17,15 @@ import lejos.robotics.geometry.Point2D;
 
 /**
  * An autonomous robot capable of finding and manipulating Styrofoam blocks, 
- * while navigating within an enclosed area populated with known obstacles randomly placed with a 12 x 12 enclosure.
+ * while navigating within an enclosed area populated with unknown obstacles randomly placed with a 12 x 12 enclosure of 30.45cm tiles.
  * 
  * This is the main robot class from which the program will be executed and all the operations will be called.
  * 
- * @version 4.0
+ * @version 5.0
  * @author Solvie Lee
  *
  */
-public class Robot_5_final {
+public class Robot {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor armMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
@@ -91,14 +91,10 @@ public class Robot_5_final {
 	 * it will perform the localization and block finding routines in sequence.
 	 */
 	public static void execute(){
-		//(package for Wifi communications not available yet on mycourses.) 
-		
-		//TODO: wait for information from computer about its coordinates and enemy base, etc. 
 		localize();
 		findEnemyBase();
 		findFlag();
 		returnHomeBase();
-		//execute the rest of the program.
 	}
 	
 	/**
@@ -115,10 +111,9 @@ public class Robot_5_final {
 	public static void findEnemyBase(){
 		odo.startOdoCorrection(obDetector);
 		display.setPart(2);
-		double x, y; //Hardcoded to 60,60 for now
+		double x, y;
 		x = opponentHomeZoneBL_X;
 		y = opponentHomeZoneBL_Y;
-		
 		
 		pathFinder.findPathTo(x-15, y-15, obstacles);
 		return;
@@ -145,9 +140,6 @@ public class Robot_5_final {
 	 */
 	public static void returnHomeBase(){
 		display.setPart(2);
-		//return the flag to the destination
-		double x=0, y=0;
-		//TODO set x and y to the coordinates of the home base
 		pathFinder.findPathTo(dropZone_X,dropZone_Y, obstacles);
 		
 		navi.turnTo(45, true);
@@ -166,7 +158,6 @@ public class Robot_5_final {
 			LCD.drawString("Connection failed", 0, 8);
 		}
 		
-		// example usage of Transmission class
 		Transmission t = conn.getTransmission();
 		if (t == null) {
 			LCD.drawString("Failed to read transmission", 0, 5);
@@ -187,12 +178,10 @@ public class Robot_5_final {
 			// print out the transmission information
 			conn.printTransmission();
 		}
-		// stall until user decides to end program
-		//Button.ESCAPE.waitForPress(); 
 	}
 	
 	public static void test(){
-		/*
+		
 		int option = 0;
 		while (option == 0)
 			option = Button.waitForAnyPress(); // ID Right executes
@@ -206,26 +195,14 @@ public class Robot_5_final {
 			System.exit(-1);
 			break;
 		}
-		*/
-			opponentHomeZoneBL_X = 30.48*2;
-			opponentHomeZoneBL_Y = 30.48*3;
-			opponentHomeZoneTR_X = 30.48*4;
-			opponentHomeZoneTR_Y = 30.48*5;
-			dropZone_X = 30.48*6;
-			dropZone_Y = 30.48*6;
-			opponentFlagType = 5;
-//			Point2D point1=new Point2D.Double(opponentHomeZoneBL_X,opponentHomeZoneBL_Y);
-//			Point2D point2=new Point2D.Double(opponentHomeZoneTR_X,opponentHomeZoneTR_Y);
-//			Point2D point3=new Point2D.Double(0,0);
-//			search.searching(point1, point2, point3,5,1);
-			
-//			flagCapturer.down();
-//			navi.travelForwards2(3);
-//			flagCapturer.throwaway();
-//			navi.travelForwards2(3);
-//			flagCapturer.down();
-//			navi.travelForwards2(3);
-//			flagCapturer.up();
+		
+		opponentHomeZoneBL_X = 30.48*2;
+		opponentHomeZoneBL_Y = 30.48*3;
+		opponentHomeZoneTR_X = 30.48*4;
+		opponentHomeZoneTR_Y = 30.48*5;
+		dropZone_X = 30.48*6;
+		dropZone_Y = 30.48*6;
+		opponentFlagType = 5;
 		
 	}
 	

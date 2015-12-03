@@ -19,27 +19,25 @@ public class Display implements TimerListener {
 	private TextLCD LCD = LocalEV3.get().getTextLCD();
 	private double[] pos;
 	private boolean objectDetected, objectClose;
-	private int pt, blockDetected, distance, color;
+	private int pt;
 	
 	/**
 	 * Default constructor
+	 * @param obdetector the ObjectDetector
 	 */
 	public Display(ObjectDetector obdetector) {
 		this.obDetector = obdetector;
 		this.odo = obdetector.getNavi().getOdo();
 		this.lcdTimer = new Timer(LCD_REFRESH, this);
-		this.objectDetected = false;
-		this.blockDetected = -1;
 		this.pos = new double[3];
 		this.pt = 0;
 		lcdTimer.start();
 	}
 
 	/**
-	 * Displays the proper screen for each part.
+	 * Displays the proper screen for each section of the sequence.
 	 */
 	public void timedOut() {
-		// do case switch with this. 
 	switch(pt){	
 		case (0):
 			displayOne();
@@ -52,9 +50,6 @@ public class Display implements TimerListener {
 			break;
 		case (3):
 			displayBlockFinding();
-			break;
-		case (4):
-			displayBlockCapturing();
 			break;
 		default:
 			System.exit(-1);
@@ -79,18 +74,18 @@ public class Display implements TimerListener {
 	}
 	
 	/**
-	 * Displays the odometry values for localization
+	 * The display method for the localization sequence
 	 */
-	public void displayLocalization(){ //Displays information
-		//TODO
+	public void displayLocalization(){ 
 		LCD.drawString("Localizing", 0, 0);
 		
 	}
 	
 	/**
-	 * Displays the odometry values
+	 * The display method for the navigation sequence. Displays the distance reported by the ObjectDetector, whether an object is detected, whether
+	 * the object is "close" (as defined in the ObjectDetector), and its current x and y position as reported by the odometer.
 	 */
-	public void displayNavigation(){ //Displays information
+	public void displayNavigation(){ 
 		LCD.drawString("Navigating", 0, 0);
 		
 		objectDetected = obDetector.getVisionStatus()[0];
@@ -102,25 +97,24 @@ public class Display implements TimerListener {
 		odo.getPosition(pos);
 
 		LCD.clear();
-		LCD.drawString("D:", 0, 1); // display distance
+		LCD.drawString("D:", 0, 1); 
 		LCD.drawString(String.valueOf(distance), 3, 1);
-		/*LCD.drawString("H: ", 0, 1); // display heading
-		LCD.drawInt((int) pos[2], 3, 1); */
-		LCD.drawString("Object:", 0, 2); // display objectDetected
+		LCD.drawString("Object:", 0, 2); 
 		LCD.drawInt(objectDetectedInt, 7, 2);
-		LCD.drawString("Close:", 0, 3); // display objectClose
+		LCD.drawString("Close:", 0, 3); 
 		LCD.drawInt(objectCloseInt, 7, 3);
-		LCD.drawString("x:", 0, 4); // display x position
+		LCD.drawString("x:", 0, 4); 
 		LCD.drawString(String.valueOf(odo.getX()), 3, 4);
-		LCD.drawString("y:", 0, 5); // display y position
+		LCD.drawString("y:", 0, 5); 
 		LCD.drawString(String.valueOf(odo.getY()), 3, 5);
 		
 	}
 	
 	/**
-	 * Displays whether there is an object in front of it and what color it is.
+	 * The display method for the searching sequence inside the enemy zone. Displays the current x and y position, the heading as reported by the odometer,
+	 * and the distance and color of an object in front of it as reported by the ObjectDetector
 	 */
-	public void displayBlockFinding(){ //Displays information
+	public void displayBlockFinding(){ 
 		odo.getPosition(pos);
 		LCD.clear();
 		LCD.drawString("X: ", 0, 0);
@@ -131,14 +125,6 @@ public class Display implements TimerListener {
 		LCD.drawInt((int)pos[2], 3, 2);
 		LCD.drawString("D: "+obDetector.getdistance(), 0, 3);
 		LCD.drawString("C: "+obDetector.getcolornumber(), 0, 4);
-		
-	}
-	
-	/**
-	 * Display screen for when block is being captured.
-	 */
-	public void displayBlockCapturing(){ //Displays information
-		//TODO
 		
 	}
 	

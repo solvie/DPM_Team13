@@ -22,7 +22,6 @@ public class Localizer {
 	private ObjectDetector detector;
 	private Odometer odo;
 	private Navigator navigate;
-	private boolean finished;
 	private ArrayList<Double> Th = new ArrayList<Double>();
 	
 	/**
@@ -33,16 +32,13 @@ public class Localizer {
 		this.detector = obDetector;
 		this.navigate = obDetector.getNavi();
 		this.odo = navigate.getOdo();
-		this.finished = false;
 	}
-	
 	
 	/**
 	 * This method performs the localization routine using an ultrasonic sensor. By the end of it, the robot should have moved to its 0,0 coordinate 
 	 * (based on the new coordinate system as defined in the previous method)
 	 */
 	public void doLocalization(){
-		finished = false;
 		double angleA, angleB, deltaT;
 		angleA=0;
 		angleB=0;
@@ -85,6 +81,7 @@ public class Localizer {
 		// update the odometer position
 		odo.setPosition(new double [] {0.0, 0.0, odo.getAng()+deltaT}, new boolean [] {false,false,true});
 		
+		// travel closer to the 0,0 on the real grid for the light localization sequence.
 		navigate.travelTo(8, 8);
 		
 		// start rotating and clock all 4 grid lines
@@ -108,11 +105,6 @@ public class Localizer {
 		// when done travel to (0,0) and turn to 0 degrees
 		navigate.travelTo(0.0, 0.0);
 		navigate.turnTo(0, true);
-		finished = true;
-	}
-	
-	public boolean isFinished(){
-		return finished;
 	}
 	
 }

@@ -2,57 +2,44 @@ package robot;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
- * This class allows us to manipulate the arm
+ * This class allows the robot to manipulate the arm
  * @author Scott Conrad, Shawn Lu
- * @version 2.0
+ * @version 3.0
  */
 
 public class FlagCapturer {
 	private EV3LargeRegulatedMotor arm; 
 	
+	/**
+	 * Default Constructor
+	 * @param armMotor the motor that controls the arm.
+	 */
 	public FlagCapturer(EV3LargeRegulatedMotor armMotor){
 		this.arm=armMotor;
-//		arm.setStallThreshold(6, 20);
 	}
 	
+	/**
+	 * Method that raises the arm (and also causes the grasping motion)
+	 */
 	public synchronized void up(){
-//		arm.setSpeed(100);
 		arm.setAcceleration(200);
-		
-//		arm.rotate(-145,false);
-//		while(!arm.isStalled()){
-//			arm.rotate(-3,true);}
-//		arm.rotate(15,false);
-		
 		arm.rotateTo(-160);
 	}
 	
+	/**
+	 * Method to lower the arm (and also causes the releasing motion)
+	 */
 	public synchronized void down(){
-//		arm.setSpeed(100);
 		arm.setAcceleration(250);
-		
-//		arm.rotate(170,false);
-//		arm.flt(true);
-		
-//		while(!arm.isStalled()){
-//			arm.rotate(8,true);}
-//		arm.rotate(-15,true);
-		
 		arm.rotateTo(190);
 		arm.flt(true);
 	}
 	
+	/**
+	 * Method to raise the arm at a fast acceleration to grasp an object and "throw" it behind the robot
+	 */
 	public synchronized void throwaway(){
-//		arm.setSpeed(1600);
 		arm.setAcceleration(1200);
-		
-//		arm.rotate(-180,true);
-//		while(!arm.isStalled()){
-//			arm.rotate(-10,true);}
-//		arm.rotate(15,true);
-		
 		arm.rotateTo(-180);
-		
 	}
-	
 }
