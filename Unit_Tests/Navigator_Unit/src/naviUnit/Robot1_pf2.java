@@ -11,7 +11,7 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 import lejos.robotics.geometry.Point2D;
 
-public class Robot1_pf1 {
+public class Robot1_pf2 {
 
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
@@ -77,7 +77,7 @@ public class Robot1_pf1 {
 		obDetector.start();
 		
 		
-		pathFinder.findPathTo(60,60, obstacles);
+		pathFinder.findPathTo(60,65, obstacles);
 	
 		int option = 0;
 		while (option == 0)

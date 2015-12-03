@@ -1,45 +1,45 @@
 package robot;
-
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
- * This class is responsible for manipulating the arm to pick up the flag once it has been found.
- * 
- * @version 0.0
+ * This class allows the robot to manipulate the arm
+ * @author Scott Conrad, Shawn Lu
+ * @version 3.0
  */
 
 public class FlagCapturer {
-
-	private EV3LargeRegulatedMotor armMotor;
+	private EV3LargeRegulatedMotor arm; 
 	
 	/**
-	 * Default constructor
-	 * @param armMotor the motor that controls the arm of the robot. 
+	 * Default Constructor
+	 * @param armMotor the motor that controls the arm.
 	 */
 	public FlagCapturer(EV3LargeRegulatedMotor armMotor){
-		this.armMotor = armMotor;
-	}
-
-	/**
-	 * Method to manipulate arm to grab the block that is the flag
-	 */
-	public void capture() {
-		// TODO Auto-generated method stub
-		
+		this.arm=armMotor;
 	}
 	
 	/**
-	 * Method to throw a block - likely will be deprecated.
+	 * Method that raises the arm (and also causes the grasping motion)
 	 */
-	public void throwBlock(){
-		
+	public synchronized void up(){
+		arm.setAcceleration(200);
+		arm.rotateTo(-160);
 	}
 	
 	/**
-	 * Method to put a block down.
+	 * Method to lower the arm (and also causes the releasing motion)
 	 */
-	public void dropBlock(){
-		
+	public synchronized void down(){
+		arm.setAcceleration(250);
+		arm.rotateTo(190);
+		arm.flt(true);
 	}
 	
+	/**
+	 * Method to raise the arm at a fast acceleration to grasp an object and "throw" it behind the robot
+	 */
+	public synchronized void throwaway(){
+		arm.setAcceleration(1200);
+		arm.rotateTo(-180);
+	}
 }
